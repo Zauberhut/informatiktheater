@@ -7,8 +7,8 @@ const enum JoyPiAdvancedDirection {
 
 namespace JoyPiAdvanced {
     const rotaryDTPin = DigitalPin.P2;
-    const rotaryCLKPin = DigitalPin.P3;
-    const rotarySWPin = DigitalPin.P4;
+    const rotaryCLKPin = DigitalPin.P1;
+    const rotarySWPin = DigitalPin.P14;
     const KYEventID = 3100;
 
     let directionIndicator = 1;
