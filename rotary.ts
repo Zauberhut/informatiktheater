@@ -6,8 +6,8 @@ const enum JoyPiAdvancedDirection {
     //% block.loc.de="links"
     counterclockwise = 4
 }
-
-namespace Informatiktheater {
+//% weight=110  color=#3a4cf7
+namespace informatiktheater {
     const rotaryDTPin = DigitalPin.P2;
     const rotaryCLKPin = DigitalPin.P1;
     const rotarySWPin = DigitalPin.P14;
