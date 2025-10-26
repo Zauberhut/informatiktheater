@@ -10,9 +10,9 @@ const enum EncoderDirection {
 //% weight=110 color=#3a4cf7
 namespace informatiktheater {
     // Pins
-    const rotaryDTPin = DigitalPin.P2
-    const rotaryCLKPin = DigitalPin.P1
-    const rotarySWPin = DigitalPin.P14
+    const rotaryDTPin = DigitalPin.P14
+    const rotaryCLKPin = DigitalPin.P13
+    const rotarySWPin = DigitalPin.P16
 
     // Events
     const KYEventID = 3100
