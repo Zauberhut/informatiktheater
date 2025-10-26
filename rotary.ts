@@ -19,22 +19,30 @@ namespace informatiktheater {
     let currentDT = 0;
     let lastCLK = 0;
     let EvCounter = 1;
+    const debounceDelay = 10; // Debounce delay in milliseconds
+    let lastDebounceTime = 0;
 
     // Function to decide the direction in which the Encoder is being turned
     function RotaryEncoder() {
-        if (currentCLK != lastCLK) {
-            // Determine direction based on currentDT and currentCLK
-            directionIndicator = (currentDT != currentCLK) ? 1 : 0;
+        const currentTime = control.millis();
+        
+        // Check for debounce
+        if (currentTime - lastDebounceTime > debounceDelay) {
+            if (currentCLK != lastCLK) {
+                // Determine direction based on currentDT and currentCLK
+                directionIndicator = (currentDT != currentCLK) ? 1 : 0;
 
-            EvCounter += 1;
-            if (EvCounter % 2 == 0) { // Reduce event flooding
-                const eventDirection = directionIndicator == 1 
-                    ? JoyPiAdvancedDirection.clockwise 
-                    : JoyPiAdvancedDirection.counterclockwise;
+                EvCounter += 1;
+                if (EvCounter % 2 == 0) { // Reduce event flooding
+                    const eventDirection = directionIndicator == 1 
+                        ? JoyPiAdvancedDirection.clockwise 
+                        : JoyPiAdvancedDirection.counterclockwise;
 
-                control.raiseEvent(KYEventID + eventDirection, eventDirection);
+                    control.raiseEvent(KYEventID + eventDirection, eventDirection);
+                }
+                lastCLK = currentCLK;
             }
-            lastCLK = currentCLK;
+            lastDebounceTime = currentTime; // Update last debounce time
         }
     }
 
