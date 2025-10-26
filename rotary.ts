@@ -44,8 +44,7 @@ namespace Informatiktheater {
       */
     //% block="initialize Rotary Encoder"
     //% block.loc.de="Drehknopf initialisieren"
-    //% subcategory="Rotary Encoder"
-    //% block.loc.de="Drehknopf"
+    //% subcategory="Drehknopf"
     //% weight=100
     export function initializeRotaryEncoder() {
         led.enable(false)
@@ -85,7 +84,7 @@ namespace Informatiktheater {
       */
     //% block="on rotary encoder turned in direction %direction"
     //% block.loc.de="Wenn der Drehknopf nach %direction gedreht wird"
-    //% subcategory="Rotary Encoder"
+    //% subcategory="Drehknopf"
     //% weight=100
     export function rotaryEncoderonTurned(direction: JoyPiAdvancedDirection , handler: () => void) {
         control.onEvent(KYEventID + direction, direction, handler);
@@ -96,7 +95,7 @@ namespace Informatiktheater {
      */
     //% block="on rotary encoder pressed"
     //% block.loc.de="Wenn der Drehknopf gedrückt wird"
-    //% subcategory="Rotary Encoder"
+    //% subcategory="Drehknopf"
     //% weight=90
     export function rotaryEncoderonPressEvent(handler: () => void) {
         pins.onPulsed(rotarySWPin, PulseValue.Low, function () {
