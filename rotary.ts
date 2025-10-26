@@ -9,9 +9,9 @@ const enum JoyPiAdvancedDirection {
 
 //% weight=110 color=#3a4cf7
 namespace informatiktheater {
-    const rotaryDTPin = DigitalPin.P2;
-    const rotaryCLKPin = DigitalPin.P1;
-    const rotarySWPin = DigitalPin.P14;
+    const rotaryDTPin = DigitalPin.P14;
+    const rotaryCLKPin = DigitalPin.P13;
+    const rotarySWPin = DigitalPin.P16;
     const KYEventID = 3100;
 
     let directionIndicator = 1;
