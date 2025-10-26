@@ -7,7 +7,7 @@ const enum JoyPiAdvancedDirection {
     counterclockwise = 4
 }
 
-namespace JoyPiAdvanced {
+namespace Informatiktheater {
     const rotaryDTPin = DigitalPin.P2;
     const rotaryCLKPin = DigitalPin.P1;
     const rotarySWPin = DigitalPin.P14;
