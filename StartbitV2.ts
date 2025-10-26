@@ -744,7 +744,7 @@ namespace informatiktheater {
     //% red.defl=255 red.min=0 red.max=255
     //% blue.defl=255 blue.min=0 blue.max=255
     //% green.defl=255 green.min=0 green.max=255
-    //% 
+    //% subcategory="Farben"
     //% weight=21
     
     export function rgb(red: number, green: number, blue: number): number {
@@ -755,7 +755,7 @@ namespace informatiktheater {
      * creates a color from hsv color picker
      * @param hue color
      */
-    //% 
+    //% subcategory="Farben"
     //% blockId="neopixel_hsv" block="hue %hue"
     //% block.loc.de="Farbe (0-255) %hue"
     //% jsdoc.loc.de="Erstellt eine Farbe"
@@ -1204,7 +1204,7 @@ namespace informatiktheater {
      */
     //% blockId="color_for_led_16" block="$c_1|$c_2|$c_3|$c_4|$c_5|$c_6|$c_7|$c_8$c_9$c_10$c_11$c_12$c_13$c_14$c_15$c_16"
     //% subcategory="Farben"
-    //% group="Farben" weight=200
+    //% group="Farben" weight=10
 
     //% c_1.shadow="brightColorNumberPicker"
     //% c_2.shadow="brightColorNumberPicker"
@@ -1249,7 +1249,7 @@ namespace informatiktheater {
      */
     //% blockId="color_for_led_32" block="$c_1|$c_2|$c_3|$c_4|$c_5|$c_6|$c_7|$c_8|$c_9|$c_10|$c_11|$c_12|$c_13|$c_14|$c_15|$c_16|$c_17|$c_18|$c_19|$c_20|$c_21|$c_22|$c_23|$c_24|$c_25|$c_26|$c_27|$c_28|$c_29|$c_30|$c_31|$c_32|"
     //% subcategory="Farben"
-    //% group="Farben" weight=110 
+    //% group="Farben" weight=11 
 
     //% c_1.shadow="brightColorNumberPicker"
     //% c_2.shadow="brightColorNumberPicker"
@@ -1925,7 +1925,7 @@ namespace informatiktheater {
   /**
    * Binds code to be executed to onPulsed event with value high
    */
-  //% weight=11
+  //% weight=8
   //% block="Push-button pressed|on %port"
   //% block.loc.de="Taster gedrückt|auf|%port"
   //% subcategory="Sensoren"
@@ -2006,7 +2006,7 @@ namespace informatiktheater {
    * Binds code to be executed to onPulsed event with value high on event handler.
    * The initial state will always be set to zero and the variable has local scope only!
    */
-  //% weight=13
+  //% weight=20
   //% block="Push-button on/off|on %port |state "
   //% block.loc.de="Taster ein/aus|auf %port |Status"
   //% subcategory="Sensoren"
