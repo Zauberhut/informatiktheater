@@ -12,7 +12,6 @@ namespace Informatiktheater {
     const rotaryCLKPin = DigitalPin.P1;
     const rotarySWPin = DigitalPin.P14;
     const KYEventID = 3100;
-
     let directionIndicator = 1;
     let currentCLK = 0;
     let currentDT = 0;
@@ -45,7 +44,7 @@ namespace Informatiktheater {
     //% block="initialize Rotary Encoder"
     //% block.loc.de="Drehknopf initialisieren"
     //% subcategory="Drehknopf"
-    //% weight=100
+    //% weight=10
     export function initializeRotaryEncoder() {
         led.enable(false)
 
