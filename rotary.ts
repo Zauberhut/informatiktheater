@@ -10,9 +10,9 @@ const enum JoyPiAdvancedDirection {
 //% weight=110 color=#3a4cf7
 namespace informatiktheater {
     // Pins
-    const rotaryDTPin = DigitalPin.P14
-    const rotaryCLKPin = DigitalPin.P13
-    const rotarySWPin = DigitalPin.P16
+    const rotaryDTPin = DigitalPin.P2
+    const rotaryCLKPin = DigitalPin.P1
+    const rotarySWPin = DigitalPin.P14
 
     // Events
     const KYEventID = 3100
@@ -81,7 +81,8 @@ namespace informatiktheater {
      */
     //% block="Drehknopf initialisieren"
     //% block.loc.en="initialize Rotary Encoder"
-    //% subcategory="Drehknopf"
+    //% subcategory="Sensoren"
+    //% group="Drehknopf"
     //% weight=150
     export function initializeRotaryEncoder() {
         led.enable(false)
@@ -107,7 +108,8 @@ namespace informatiktheater {
      */
     //% block="Wenn der Drehknopf nach %direction gedreht wird"
     //% block.loc.en="on rotary encoder turned %direction"
-    //% subcategory="Drehknopf"
+    //% subcategory="Sensoren"
+    //% group="Drehknopf"
     //% weight=100
     export function onRotaryEncoderTurned(direction: JoyPiAdvancedDirection, handler: () => void) {
         control.onEvent(KYEventID + direction, direction, handler)
@@ -118,7 +120,8 @@ namespace informatiktheater {
      */
     //% block="Wenn der Drehknopf gedrückt wird"
     //% block.loc.en="on rotary encoder pressed"
-    //% subcategory="Drehknopf"
+    //% subcategory="Sensoren"
+    //% group="Drehknopf"
     //% weight=90
     export function onRotaryEncoderPressed(handler: () => void) {
         pins.onPulsed(rotarySWPin, PulseValue.Low, function () {
