@@ -1,7 +1,9 @@
 const enum JoyPiAdvancedDirection {
     //% block="Right"
+    //% block.loc.de="rechts"
     clockwise = 2,
     //% block="Left"
+    //% block.loc.de="links"
     counterclockwise = 4
 }
 
@@ -41,7 +43,9 @@ namespace JoyPiAdvanced {
       * Initializes the rotary encoder
       */
     //% block="initialize Rotary Encoder"
+    //% block.loc.de="Drehknopf initialisieren"
     //% subcategory="Rotary Encoder"
+    //% block.loc.de="Drehknopf"
     //% weight=100
     export function initializeRotaryEncoder() {
         led.enable(false)
@@ -80,6 +84,7 @@ namespace JoyPiAdvanced {
       * @param JoyPiAdvancedDirection  Direction to be listened to
       */
     //% block="on rotary encoder turned in direction %direction"
+    //% block.loc.de="Wenn der Drehknopf nach %direction gedreht wird"
     //% subcategory="Rotary Encoder"
     //% weight=100
     export function rotaryEncoderonTurned(direction: JoyPiAdvancedDirection , handler: () => void) {
@@ -90,6 +95,7 @@ namespace JoyPiAdvanced {
      * Event that is executed as soon as the rotary encoder is pressed
      */
     //% block="on rotary encoder pressed"
+    //% block.loc.de="Wenn der Drehknopf gedrückt wird"
     //% subcategory="Rotary Encoder"
     //% weight=90
     export function rotaryEncoderonPressEvent(handler: () => void) {
