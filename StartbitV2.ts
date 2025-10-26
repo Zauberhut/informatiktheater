@@ -274,7 +274,8 @@ namespace informatiktheater {
     //% value.fieldOptions.colours='["#000000","#ff0000","#ffa500","#ffff00","#00ff00","#0000ff","#00ffff","#ff00ff","#8a2be2","#ffffff"]'
     //% value.fieldOptions.columns=5 value.fieldOptions.className='rgbColorPicker' 
     //% 
-    //% weight=10
+    //% weight=500
+    //% Subcategory="Farben"
     //% group="Farben"
     export function __colorNumberPicker(value: number) {
         return value;
@@ -774,6 +775,7 @@ namespace informatiktheater {
     //% blockId="neopixel_colors" block="%color"
     //% block.loc.de="%color"
     //% jsdoc.loc.de="Bekannte RGB-Farben"
+    //% Subcategory="Farben"
     //% weight=50
     export function colors(color: NeoPixelColors): number {
         return color;
@@ -954,7 +956,7 @@ namespace informatiktheater {
          */
         //%blockId="Matrix_clear" block="%matrix| ausschalten"
         //% jsdoc.loc.de="Schalte alle NeoPixel aus. Damit die Änderung sichtbar wird, muss anschließend ``anzeigen`` aufgerufen werden."
-        //% weight=33
+        //% weight=25
         //% subcategory=Matrix
         //% group="Features"
         clear(): void {
@@ -1131,7 +1133,7 @@ namespace informatiktheater {
 
         //% blockId="neopixel_set_matrix_16" block="Matrix %matrix %c_0|%c_1|%c_2|%c_3|%c_4|%c_5|%c_6|%c_7|%c_8|%c_9|%c_10|%c_11|%c_12|%c_13|%c_14|%c_15" 
         //% weight=100
-        //% subcategory=Matrix
+        //% subcategory="Matrix"
         //% group="Features" weight=10
         //% c_0.shadow=color_for_led_16
         //% c_1.shadow=color_for_led_16
@@ -1201,7 +1203,7 @@ namespace informatiktheater {
      * Returns list of 16 color choices for the LEDs
      */
     //% blockId="color_for_led_16" block="$c_1|$c_2|$c_3|$c_4|$c_5|$c_6|$c_7|$c_8$c_9$c_10$c_11$c_12$c_13$c_14$c_15$c_16"
-    //% subcategory=Matrix
+    //% subcategory="Farben"
     //% group="Farben" weight=200
 
     //% c_1.shadow="brightColorNumberPicker"
@@ -1246,7 +1248,7 @@ namespace informatiktheater {
      * Returns list of 32 color choices for the LEDs
      */
     //% blockId="color_for_led_32" block="$c_1|$c_2|$c_3|$c_4|$c_5|$c_6|$c_7|$c_8|$c_9|$c_10|$c_11|$c_12|$c_13|$c_14|$c_15|$c_16|$c_17|$c_18|$c_19|$c_20|$c_21|$c_22|$c_23|$c_24|$c_25|$c_26|$c_27|$c_28|$c_29|$c_30|$c_31|$c_32|"
-    //% subcategory=Matrix
+    //% subcategory="Farben"
     //% group="Farben" weight=110 
 
     //% c_1.shadow="brightColorNumberPicker"
