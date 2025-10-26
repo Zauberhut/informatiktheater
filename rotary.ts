@@ -1,4 +1,4 @@
-const enum JoyPiAdvancedDirection {
+const enum EncoderDirection {
     //% block="Right"
     //% block.loc.de="rechts"
     clockwise = 2,
@@ -18,13 +18,13 @@ namespace informatiktheater {
     const KYEventID = 3100
 
     // Decoder-Parameter
-    const stepsPerDetent = 4    // viele Encoder liefern 4 Teilschritte pro Rastung
-    const sampleMs = 1          // Polling-Intervall in Millisekunden
-    const invertDirection = false // auf true setzen, wenn Drehrichtung vertauscht ist
+    const stepsPerDetent = 4       // viele Encoder liefern 4 Teilschritte pro Rastung
+    const sampleMs = 1             // Polling-Intervall in Millisekunden
+    const invertDirection = false  // auf true setzen, wenn Drehrichtung vertauscht ist
 
     // Interner Status für Quadratur-Decoder
-    let prevState = 0           // vorheriger 2-Bit-Zustand (A=CLK, B=DT)
-    let stepAccumulator = 0     // sammelt Teilschritte bis zur Rastung
+    let prevState = 0              // vorheriger 2-Bit-Zustand (A=CLK, B=DT)
+    let stepAccumulator = 0        // sammelt Teilschritte bis zur Rastung
 
     // Debounce für Taster
     const pressDebounceMs = 30
@@ -32,7 +32,7 @@ namespace informatiktheater {
 
     // Quadratur-Übergangs-Tabelle (Gray-Code Decoder)
     // Index: (prevState << 2) | currState, Werte: -1, 0, +1
-    // Reihenfolge der Bits: A=CLK (MSB), B=DT (LSB) im 2-Bit State
+    // Bits: A=CLK (MSB), B=DT (LSB)
     const transTable: number[] = [
         // prev=0: 00->00,01,10,11
          0, +1, -1,  0,
@@ -56,16 +56,15 @@ namespace informatiktheater {
                 const delta = transTable[idx]
 
                 if (delta !== 0) {
-                    // Optional Richtung invertieren
                     const signedDelta = invertDirection ? -delta : delta
                     stepAccumulator += signedDelta
 
                     // Eine volle Rastung erreicht?
                     if (stepAccumulator >= stepsPerDetent) {
-                        control.raiseEvent(KYEventID + JoyPiAdvancedDirection.clockwise, JoyPiAdvancedDirection.clockwise)
+                        control.raiseEvent(KYEventID + EncoderDirection.clockwise, EncoderDirection.clockwise)
                         stepAccumulator = 0
                     } else if (stepAccumulator <= -stepsPerDetent) {
-                        control.raiseEvent(KYEventID + JoyPiAdvancedDirection.counterclockwise, JoyPiAdvancedDirection.counterclockwise)
+                        control.raiseEvent(KYEventID + EncoderDirection.counterclockwise, EncoderDirection.counterclockwise)
                         stepAccumulator = 0
                     }
                 }
@@ -77,22 +76,22 @@ namespace informatiktheater {
     }
 
     /**
-     * Drehknopf initialisieren (robuste Quadratur-Auswertung)
+     * Initializes the rotary encoder (robust quadrature decoding)
      */
-    //% block="Drehknopf initialisieren"
-    //% block.loc.en="initialize Rotary Encoder"
+    //% block="initialize Rotary Encoder"
+    //% block.loc.de="Drehknopf initialisieren"
     //% subcategory="Sensoren"
     //% group="Drehknopf"
     //% weight=150
     export function initializeRotaryEncoder() {
         led.enable(false)
 
-        // WICHTIG: Pull-Ups auf BEIDEN Kanälen und dem Taster
+        // Pull-Ups auf allen Eingängen
         pins.setPull(rotaryCLKPin, PinPullMode.PullUp)
         pins.setPull(rotaryDTPin, PinPullMode.PullUp)
         pins.setPull(rotarySWPin, PinPullMode.PullUp)
 
-        // Startzustand erfassen, bevor die Schleife startet
+        // Startzustand erfassen
         const a0 = pins.digitalReadPin(rotaryCLKPin) & 1
         const b0 = pins.digitalReadPin(rotaryDTPin) & 1
         prevState = (a0 << 1) | b0
@@ -103,23 +102,23 @@ namespace informatiktheater {
     }
 
     /**
-     * Wenn der Drehknopf nach einer Richtung gedreht wird
+     * Event when the rotary encoder is turned in a given direction
      * @param direction Richtung, auf die gehört wird
      */
-    //% block="Wenn der Drehknopf nach %direction gedreht wird"
-    //% block.loc.en="on rotary encoder turned %direction"
+    //% block="on rotary encoder turned %direction"
+    //% block.loc.de="Wenn der Drehknopf nach %direction gedreht wird"
     //% subcategory="Sensoren"
     //% group="Drehknopf"
     //% weight=100
-    export function onRotaryEncoderTurned(direction: JoyPiAdvancedDirection, handler: () => void) {
+    export function onRotaryEncoderTurned(direction: EncoderDirection, handler: () => void) {
         control.onEvent(KYEventID + direction, direction, handler)
     }
 
     /**
-     * Wenn der Drehknopf gedrückt wird (mit Debounce)
+     * Event when the rotary encoder is pressed (debounced)
      */
-    //% block="Wenn der Drehknopf gedrückt wird"
-    //% block.loc.en="on rotary encoder pressed"
+    //% block="on rotary encoder pressed"
+    //% block.loc.de="Wenn der Drehknopf gedrückt wird"
     //% subcategory="Sensoren"
     //% group="Drehknopf"
     //% weight=90
