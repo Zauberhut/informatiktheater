@@ -44,7 +44,7 @@ namespace Informatiktheater {
     //% block="initialize Rotary Encoder"
     //% block.loc.de="Drehknopf initialisieren"
     //% subcategory="Drehknopf"
-    //% weight=10
+    //% weight=150
     export function initializeRotaryEncoder() {
         led.enable(false)
 
