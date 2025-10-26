@@ -19,7 +19,7 @@ namespace informatiktheater {
     let currentDT = 0;
     let lastCLK = 0;
     let EvCounter = 1;
-    const debounceDelay = 10; // Debounce delay in milliseconds
+    const debounceDelay = 30; // Debounce delay in milliseconds
     let lastDebounceTime = 0;
 
     // Function to decide the direction in which the Encoder is being turned
