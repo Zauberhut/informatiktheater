@@ -275,7 +275,7 @@ namespace informatiktheater {
     //% value.fieldOptions.columns=5 value.fieldOptions.className='rgbColorPicker' 
     //% 
     //% weight=500
-    //% Subcategory="Farben"
+    //% subcategory="Farben"
     //% group="Farben"
     export function __colorNumberPicker(value: number) {
         return value;
@@ -755,11 +755,12 @@ namespace informatiktheater {
      * creates a color from hsv color picker
      * @param hue color
      */
-    //% subcategory="Farben"
+   
     //% blockId="neopixel_hsv" block="hue %hue"
     //% block.loc.de="Farbe (0-255) %hue"
     //% jsdoc.loc.de="Erstellt eine Farbe"
     //% hue.shadow="colorWheelHsvPicker"
+    //% subcategory="Farben"
     //% weight=80
      
 
@@ -775,7 +776,7 @@ namespace informatiktheater {
     //% blockId="neopixel_colors" block="%color"
     //% block.loc.de="%color"
     //% jsdoc.loc.de="Bekannte RGB-Farben"
-    //% Subcategory="Farben"
+    //% subcategory="Farben"
     //% weight=50
     export function colors(color: NeoPixelColors): number {
         return color;
