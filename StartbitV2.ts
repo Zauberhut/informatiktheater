@@ -1046,9 +1046,6 @@ namespace informatiktheater {
 
 
 
-
-        * ************************************
-
         // ==============================
 // Variable-breite Fonts + Textsteuerung
 // ==============================
