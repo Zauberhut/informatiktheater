@@ -1,5 +1,5 @@
 namespace JoyPiAdvanced {
-    const joystickButtonPin = DigitalPin.P10
+    const joystickButtonPin = DigitalPin.P16
   
     /**
      * Returns the current X-value of the joystick
@@ -8,7 +8,7 @@ namespace JoyPiAdvanced {
     //% subcategory="Joystick"
     //% weight=100
     export function joystickGetXValue(): number {
-      return adcReadValue(0)
+      return adcReadValue(14)
     }
   
     /**
@@ -18,7 +18,7 @@ namespace JoyPiAdvanced {
     //% subcategory="Joystick"
     //% weight=90
     export function joystickGetYValue(): number {
-      return adcReadValue(1)
+      return adcReadValue(13)
     }
   
     /**
