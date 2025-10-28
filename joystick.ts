@@ -8,7 +8,7 @@ namespace JoyPiAdvanced {
     //% subcategory="Joystick"
     //% weight=100
     export function joystickGetXValue(): number {
-      return adcReadValue(14)
+      return adcReadValue(2)
     }
   
     /**
@@ -18,7 +18,7 @@ namespace JoyPiAdvanced {
     //% subcategory="Joystick"
     //% weight=90
     export function joystickGetYValue(): number {
-      return adcReadValue(13)
+      return adcReadValue(1)
     }
   
     /**
