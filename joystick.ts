@@ -1,50 +1,140 @@
+// ===== Enum für Block-Auswahl =====
 export enum GroveJoystickKey {
+    //% block="Keiner"
     None = 0,
+    //% block="Rechts"
     Right = 1,
+    //% block="Links"
     Left = 2,
+    //% block="Hoch"
     Up = 3,
+    //% block="Runter"
     Down = 4,
+    //% block="Oben links"
     UL = 5,
+    //% block="Oben rechts"
     UR = 6,
+    //% block="Unten links"
     LL = 7,
+    //% block="Unten rechts"
     LR = 8,
+    //% block="Gedrückt"
     Press = 9
 }
 
-const joystickEventID = 123; // Beispielwert
-let lastJoystick = GroveJoystickKey.None;
-
-export class GroveJoystick {
-    joyread(xPin: AnalogPin, yPin: AnalogPin): number {
-        let xdata = 0, ydata = 0, result = 0;
-        if (xPin && yPin) {
-            xdata = pins.analogReadPin(xPin);
-            ydata = pins.analogReadPin(yPin);
-            // Logik für die Joystick-Ablesung
-        } else {
-            result = GroveJoystickKey.None;
-        }
-        return result;
-    }
-}
-
+/**
+ * Funktionen für Grove-Module
+ */
+//% weight=10 color=#9F79EE icon="\uf1b3" block="Grove"
+//% groups='["Thumbjoystick"]'
 namespace grove {
-    export function getJoystick(xpin: AnalogPin, ypin: AnalogPin): number {
-        const joystick = new GroveJoystick();
-        return joystick.joyread(xpin, ypin);
+
+    const joystickEventID = 3100
+    let lastJoystick = GroveJoystickKey.None
+
+    // Interne Schwellwerte
+    const TH_LOW = 400
+    const TH_HIGH = 600
+    const TH_PRESS = 1000
+
+    /**
+     * Interne Erkennung der Joystick-Richtung aus X/Y.
+     * Liefert einen GroveJoystickKey.
+     */
+    //% blockHidden=true
+    export function joyreadRaw(xPin: AnalogPin, yPin: AnalogPin): GroveJoystickKey {
+        let xdata = 0, ydata = 0
+        let result = GroveJoystickKey.None
+
+        if (xPin != null && yPin != null) {
+            xdata = pins.analogReadPin(xPin)
+            ydata = pins.analogReadPin(yPin)
+
+            if (xdata > TH_PRESS) {
+                result = GroveJoystickKey.Press
+            } else if (xdata > TH_HIGH) {
+                if (ydata > TH_HIGH) result = GroveJoystickKey.UR
+                else if (ydata < TH_LOW) result = GroveJoystickKey.LR
+                else result = GroveJoystickKey.Right
+            } else if (xdata < TH_LOW) {
+                if (ydata > TH_HIGH) result = GroveJoystickKey.UL
+                else if (ydata < TH_LOW) result = GroveJoystickKey.LL
+                else result = GroveJoystickKey.Left
+            } else {
+                if (ydata > TH_HIGH) result = GroveJoystickKey.Up
+                else if (ydata < TH_LOW) result = GroveJoystickKey.Down
+                else result = GroveJoystickKey.None
+            }
+        } else {
+            result = GroveJoystickKey.None
+        }
+        return result
     }
 
+    /**
+     * Lies die aktuelle Joystick-Richtung (als Enum).
+     */
+    //% blockId=grove_getjoystick
+    //% block="Joystick Richtung an x %xpin y %ypin"
+    //% group="Thumbjoystick"
+    //% weight=90
+    //% xpin.defl=AnalogPin.P0 ypin.defl=AnalogPin.P1
+    export function getJoystick(xpin: AnalogPin, ypin: AnalogPin): GroveJoystickKey {
+        return joyreadRaw(xpin, ypin)
+    }
+
+    /**
+     * Wandle einen Joystick-Key in eine Zahl um (für Vergleiche).
+     */
+    //% blockId=joystickkey
+    //% block="Joystick-Key %key als Zahl"
+    //% group="Thumbjoystick"
+    //% weight=70
+    export function joystickkey(key: GroveJoystickKey): number {
+        return key
+    }
+
+    /**
+     * Reagiere auf eine erkannte Joystick-Richtung.
+     */
+    //% blockId=grove_joystick_create_event
+    //% block="wenn Joystick %key an x %xpin y %ypin"
+    //% group="Thumbjoystick"
+    //% weight=80
+    //% xpin.defl=AnalogPin.P0 ypin.defl=AnalogPin.P1
     export function onJoystick(key: GroveJoystickKey, xpin: AnalogPin, ypin: AnalogPin, handler: () => void) {
-        control.onEvent(joystickEventID, key, handler);
+        control.onEvent(joystickEventID, key, handler)
         control.inBackground(() => {
             while (true) {
-                const key = new GroveJoystick().joyread(xpin, ypin);
-                if (key != lastJoystick) {
-                    lastJoystick = key; 
-                    control.raiseEvent(joystickEventID, lastJoystick);
+                const k = joyreadRaw(xpin, ypin)
+                if (k != lastJoystick) {
+                    lastJoystick = k
+                    control.raiseEvent(joystickEventID, lastJoystick)
                 }
-                basic.pause(50);
+                basic.pause(50)
             }
-        });
+        })
+    }
+
+    /**
+     * Rohwert X lesen (0..1023).
+     */
+    //% blockId=grove_joystick_read_x
+    //% block="Joystick X an %pin"
+    //% group="Thumbjoystick"
+    //% weight=60
+    export function readX(pin: AnalogPin): number {
+        return pins.analogReadPin(pin)
+    }
+
+    /**
+     * Rohwert Y lesen (0..1023).
+     */
+    //% blockId=grove_joystick_read_y
+    //% block="Joystick Y an %pin"
+    //% group="Thumbjoystick"
+    //% weight=50
+    export function readY(pin: AnalogPin): number {
+        return pins.analogReadPin(pin)
     }
 }
