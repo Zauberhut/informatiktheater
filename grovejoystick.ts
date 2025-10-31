@@ -29,13 +29,14 @@ export enum GroveJoystickKey {
 //% groups='["Thumbjoystick"]'
 namespace grove {
 
-    const joystickEventID = 3100;
-    let lastJoystick = GroveJoystickKey.None;
+    const joystickEventID = 3100
+    let lastJoystick: GroveJoystickKey = GroveJoystickKey.None
+    let joystickWatcherRunning = false
 
     // Interne Schwellwerte
-    const TH_LOW = 400;
-    const TH_HIGH = 600;
-    const TH_PRESS = 1000;
+    const TH_LOW = 400
+    const TH_HIGH = 600
+    const TH_PRESS = 1000
 
     /**
      * Interne Erkennung der Joystick-Richtung aus X/Y.
@@ -43,26 +44,26 @@ namespace grove {
      */
     //% blockHidden=true
     export function joyreadRaw(xPin: AnalogPin, yPin: AnalogPin): GroveJoystickKey {
-        let xdata = pins.analogReadPin(xPin);
-        let ydata = pins.analogReadPin(yPin);
-        let result = GroveJoystickKey.None;
+        let xdata = pins.analogReadPin(xPin)
+        let ydata = pins.analogReadPin(yPin)
+        let result = GroveJoystickKey.None
 
         if (xdata > TH_PRESS) {
-            result = GroveJoystickKey.Press;
+            result = GroveJoystickKey.Press
         } else if (xdata > TH_HIGH) {
-            if (ydata > TH_HIGH) result = GroveJoystickKey.UR;
-            else if (ydata < TH_LOW) result = GroveJoystickKey.LR;
-            else result = GroveJoystickKey.Right;
+            if (ydata > TH_HIGH) result = GroveJoystickKey.UR
+            else if (ydata < TH_LOW) result = GroveJoystickKey.LR
+            else result = GroveJoystickKey.Right
         } else if (xdata < TH_LOW) {
-            if (ydata > TH_HIGH) result = GroveJoystickKey.UL;
-            else if (ydata < TH_LOW) result = GroveJoystickKey.LL;
-            else result = GroveJoystickKey.Left;
+            if (ydata > TH_HIGH) result = GroveJoystickKey.UL
+            else if (ydata < TH_LOW) result = GroveJoystickKey.LL
+            else result = GroveJoystickKey.Left
         } else {
-            if (ydata > TH_HIGH) result = GroveJoystickKey.Up;
-            else if (ydata < TH_LOW) result = GroveJoystickKey.Down;
+            if (ydata > TH_HIGH) result = GroveJoystickKey.Up
+            else if (ydata < TH_LOW) result = GroveJoystickKey.Down
+            else result = GroveJoystickKey.None
         }
-
-        return result;
+        return result
     }
 
     /**
@@ -73,8 +74,8 @@ namespace grove {
     //% group="Thumbjoystick"
     //% weight=90
     //% xpin.defl=AnalogPin.P0 ypin.defl=AnalogPin.P1
-    export function getJoystick(xpin: AnalogPin, ypin: AnalogPin): GroveJoystickKey {
-        return joyreadRaw(xpin, ypin);
+    export function getJoystick(xpin: AnalogPin = AnalogPin.P0, ypin: AnalogPin = AnalogPin.P1): GroveJoystickKey {
+        return joyreadRaw(xpin, ypin)
     }
 
     /**
@@ -85,7 +86,7 @@ namespace grove {
     //% group="Thumbjoystick"
     //% weight=70
     export function joystickkey(key: GroveJoystickKey): number {
-        return key;
+        return key as number
     }
 
     /**
@@ -96,18 +97,22 @@ namespace grove {
     //% group="Thumbjoystick"
     //% weight=80
     //% xpin.defl=AnalogPin.P0 ypin.defl=AnalogPin.P1
-    export function onJoystick(key: GroveJoystickKey, xpin: AnalogPin, ypin: AnalogPin, handler: () => void) {
-        control.onEvent(joystickEventID, key, handler);
-        control.inBackground(() => {
-            while (true) {
-                const k = joyreadRaw(xpin, ypin);
-                if (k != lastJoystick) {
-                    lastJoystick = k;
-                    control.raiseEvent(joystickEventID, lastJoystick);
+    export function onJoystick(key: GroveJoystickKey, xpin: AnalogPin = AnalogPin.P0, ypin: AnalogPin = AnalogPin.P1, handler: () => void) {
+        control.onEvent(joystickEventID, key, handler)
+
+        if (!joystickWatcherRunning) {
+            joystickWatcherRunning = true
+            control.inBackground(() => {
+                while (true) {
+                    const k = joyreadRaw(xpin, ypin)
+                    if (k != lastJoystick) {
+                        lastJoystick = k
+                        control.raiseEvent(joystickEventID, lastJoystick)
+                    }
+                    basic.pause(50)
                 }
-                basic.pause(50);
-            }
-        });
+            })
+        }
     }
 
     /**
@@ -117,8 +122,8 @@ namespace grove {
     //% block="Joystick X an %pin"
     //% group="Thumbjoystick"
     //% weight=60
-    export function readX(pin: AnalogPin): number {
-        return pins.analogReadPin(pin);
+    export function readX(pin: AnalogPin = AnalogPin.P0): number {
+        return pins.analogReadPin(pin)
     }
 
     /**
@@ -128,7 +133,7 @@ namespace grove {
     //% block="Joystick Y an %pin"
     //% group="Thumbjoystick"
     //% weight=50
-    export function readY(pin: AnalogPin): number {
-        return pins.analogReadPin(pin);
+    export function readY(pin: AnalogPin = AnalogPin.P1): number {
+        return pins.analogReadPin(pin)
     }
 }
