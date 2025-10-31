@@ -1,4 +1,4 @@
-namespace JoyPiAdvanced {
+namespace Informatiktheater {
     const joystickButtonPin = DigitalPin.P16;
 
     /**
