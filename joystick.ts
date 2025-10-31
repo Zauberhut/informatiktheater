@@ -1,4 +1,4 @@
-namespace Informatiktheater {
+namespace informatiktheater {
     const joystickButtonPin = DigitalPin.P16;
 
     /**
