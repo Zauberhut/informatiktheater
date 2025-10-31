@@ -7,7 +7,7 @@
     "core": "file:../core",
     "ws2812b": "github:microsoft/pxt-ws2812b#v0.1.2"
   },
-  "files": ["README.md", "StartbitV2.ts", "rotary.ts", "joystick.ts", "StartbitRGBLight.ts"],
+  "files": ["README.md", "StartbitV2.ts", "rotary.ts", "grovejoystick.ts", "StartbitRGBLight.ts"],
   "testFiles": ["test.ts", "neotest.ts"],
   "public": true,
   "supportedTargets": ["microbit"],
