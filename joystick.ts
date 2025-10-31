@@ -7,7 +7,7 @@ namespace informatiktheater {
     //% subcategory="Potentiometer"
     //% weight=100
     export function potentiometerVoltage(): number {
-      return adcReadVoltage(3)
+      return pins.analogReadPin(AnalogPin.P2);
     }
   
 
