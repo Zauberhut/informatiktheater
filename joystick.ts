@@ -8,7 +8,7 @@ namespace JoyPiAdvanced {
     //% subcategory="Joystick"
     //% weight=100
     export function joystickGetXValue(): number {
-      return adcReadValue(2)
+      return adcReadValue(2);
     }
   
     /**
@@ -18,7 +18,7 @@ namespace JoyPiAdvanced {
     //% subcategory="Joystick"
     //% weight=90
     export function joystickGetYValue(): number {
-      return adcReadValue(1)
+      return adcReadValue(1);
     }
   
     /**
@@ -28,13 +28,9 @@ namespace JoyPiAdvanced {
     //% subcategory="Joystick"
     //% weight=80
     export function joystickCheckButton(): boolean {
-      led.enable(false)
-      if(!pins.digitalReadPin(joystickButtonPin)){
-        return true
-      }
-      else {
-        return false
-      }
+      return !pins.digitalReadPin(joystickButtonPin);
     }
+}
+
   }
   
