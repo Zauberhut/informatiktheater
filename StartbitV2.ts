@@ -988,6 +988,10 @@ namespace informatiktheater {
                 //If the pixel does not fit on screen, do not draw it
                 return;
             }
+            if ((this.Width === 8 && this.Height === 8) || (this.Width === 20 && this.Height === 20)) {
+        // Normal order for 8x8 and 20x20 matrices
+        this.strip.setPixelColor(y * this.Width + x, colour);
+    } else {
             if (x % 2 == 0) {
                 //Because of the zig-zag formation of the panel all even rows (including 0) are drawn top to bottom
                 this.strip.setPixelColor(y + x * this.Height, colour);
