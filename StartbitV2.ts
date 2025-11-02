@@ -1000,6 +1000,7 @@ namespace informatiktheater {
                 this.strip.setPixelColor(this.Height - 1 - y + x * this.Height, colour);
             }
         }
+     }       
 
 
 
