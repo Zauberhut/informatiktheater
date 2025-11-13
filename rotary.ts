@@ -78,8 +78,8 @@ namespace informatiktheater {
     /**
      * Initializes the rotary encoder (robust quadrature decoding)
      */
-    //% block="initialize Rotary Encoder"
-    //% block.loc.de="Drehknopf initialisieren"
+    //% block="initialize Rotary Encoder P14/P13/P16"
+    //% block.loc.de="Drehknopf initialisieren P14/P13/P16"
     //% subcategory="Eingabe"
     //% group="Drehknopf"
     //% weight=150
