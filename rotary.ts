@@ -80,7 +80,7 @@ namespace informatiktheater {
      */
     //% block="initialize Rotary Encoder"
     //% block.loc.de="Drehknopf initialisieren"
-    //% subcategory="Sensoren"
+    //% subcategory="Eingabe"
     //% group="Drehknopf"
     //% weight=150
     export function initializeRotaryEncoder() {
@@ -107,7 +107,7 @@ namespace informatiktheater {
      */
     //% block="on rotary encoder turned %direction"
     //% block.loc.de="Wenn der Drehknopf nach %direction gedreht wird"
-    //% subcategory="Sensoren"
+    //% subcategory="Eingabe"
     //% group="Drehknopf"
     //% weight=100
     export function onRotaryEncoderTurned(direction: EncoderDirection, handler: () => void) {
@@ -119,7 +119,7 @@ namespace informatiktheater {
      */
     //% block="on rotary encoder pressed"
     //% block.loc.de="Wenn der Drehknopf gedrückt wird"
-    //% subcategory="Sensoren"
+    //% subcategory="Eingabe"
     //% group="Drehknopf"
     //% weight=90
     export function onRotaryEncoderPressed(handler: () => void) {
