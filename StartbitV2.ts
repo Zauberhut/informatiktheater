@@ -1803,7 +1803,7 @@ namespace informatiktheater {
   //% blockId=ultrasonic_init
   //% block="initialize ultrasonic |%pin"
   //% block.loc.de="initialisiere Ultraschall|%pin"
-  //% subcategory="Sensoren"
+  //% subcategory="Eingabe"
   //% group="Ultraschall"
  
   export function ultrasonic_init(port: startbit_ultrasonicPort) {
@@ -1827,7 +1827,7 @@ namespace informatiktheater {
   //% blockId=startbit_ultrasonic
   //% block="get ultrasonic |distancse (cm)"
   //% block.loc.de="Ultraschall|Distanz (cm)"
-  //% subcategory="Sensoren"
+  //% subcategory="Eingabe"
   //% group="Ultraschall"
   export function startbit_ultrasonic(): number {
     pins.setPull(echoPin, PinPullMode.PullNone);
@@ -1937,7 +1937,7 @@ namespace informatiktheater {
   //% weight=8
   //% block="Push-button pressed|on %port"
   //% block.loc.de="Taster gedrückt|auf|%port"
-  //% subcategory="Sensoren"
+  //% subcategory="Eingabe"
   //% group="Taster"
   export function trittmatte_pressed(
     port: startbit_trittmattePort,
@@ -1977,7 +1977,7 @@ namespace informatiktheater {
   //% weight=12
   //% block="Push-button released|on %port"
   //% block.loc.de="Taster losgelassen|auf|%port"
-  //% subcategory="Sensoren"
+  //% subcategory="Eingabe"
   //% group="Taster"
   export function trittmatte_released(
     port: startbit_trittmattePort,
@@ -2018,7 +2018,7 @@ namespace informatiktheater {
   //% weight=20
   //% block="Push-button on/off|on %port |state "
   //% block.loc.de="Taster ein/aus|auf %port |Status"
-  //% subcategory="Sensoren"
+  //% subcategory="Eingabe"
   //% group="Taster"
   //% draggableParameters
   //% jsdoc.loc.de="Bindet auszuführenden Code bei einem PulsEvent mit Wert 'hoch' an Event Handler. Der Anfangszustand wird immer auf Null sein. Die Zustandsvariabel hat nur lokalen Scope!"
