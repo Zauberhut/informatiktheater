@@ -2,7 +2,7 @@
   "name": "informatiktheater",
   "version": "0.0.3",
   "description": "Blocks for Informatiktheater",
-  "icon": "/icon.png",
+  "icon": "./icon.png",
   "license": "MIT",
   "dependencies": {
     "core": "file:../core",
