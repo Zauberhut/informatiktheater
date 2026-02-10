@@ -2,7 +2,7 @@
   "name": "informatiktheater",
   "version": "0.0.3",
   "description": "Blocks for Informatiktheater",
-  "icon": "https://raw.githubusercontent.com/Zauberhut/informatiktheater/master/icon.png",
+  "icon": "/icon.png",
   "license": "MIT",
   "dependencies": {
     "core": "file:../core",
