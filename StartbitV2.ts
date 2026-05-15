@@ -6,7 +6,7 @@ informatiktheater.startbit_Init();
  */
 enum NeoPixelColors {
     //% block=red
-    //% block.loc.de="rot"
+    //% block.loc.de="röt"
     Red = 0xff0000,
     //% block=orange
     //% block.loc.de="orange"
