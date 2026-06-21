@@ -299,15 +299,15 @@ namespace informatiktheater {
         power_source: PowerSource
     ): Strip {
         let strip = new Strip();
-        let mode = NeoPixelMode.RGB_GRB;
-        let stride = mode === NeoPixelMode.RGBW ? 4 : 3;
+        const mode = NeoPixelMode.RGB_GRB;
+        let stride = mode == NeoPixelMode.RGBW ? 4 : 3;
         strip.buf = pins.createBuffer(numleds * stride);
         strip.start = 0;
         strip._length = numleds;
         strip._mode = mode;
         strip.setBrightness(128);
         strip._power = power_source;
-        if (power_source === PowerSource.Intern) {
+        if (power_source == PowerSource.Intern) {
             leds_total += numleds;
         }
         // HiwonderPins values are identical to DigitalPin values, so a direct
@@ -367,7 +367,7 @@ namespace informatiktheater {
 
             let hDistCW: number;
             let hDistCCW: number;
-            if (h2 !== h1 && (h2 + 360 - h1) % 360 === 0) {
+            if (h2 != h1 && (h2 + 360 - h1) % 360 == 0) {
                 hDistCW = hDistCCW = 360;
             } else {
                 hDistCW  = (h2 + 360 - h1) % 360;
@@ -386,7 +386,7 @@ namespace informatiktheater {
             const lStep = 0; // start == end luminance
             const l1_100 = l1 * 100;
 
-            if (steps === 1) {
+            if (steps == 1) {
                 this.setPixelColor(0, hsl(h1 + hStep, s1 + sStep, l1 + lStep));
             } else {
                 this.setPixelColor(0, hsl(startHue, saturation, luminance));
@@ -440,7 +440,7 @@ namespace informatiktheater {
         //% subcategory=Stripe
         //% group="Kontrolle"
         clear(): void {
-            const stride = this._mode === NeoPixelMode.RGBW ? 4 : 3;
+            const stride = this._mode == NeoPixelMode.RGBW ? 4 : 3;
             this.buf.fill(0, this.start * stride, this._length * stride);
         }
 
@@ -474,7 +474,7 @@ namespace informatiktheater {
         //% subcategory="Stripe"
         //% group="Kontrolle"
         shift(offset: number = 1): void {
-            const stride = this._mode === NeoPixelMode.RGBW ? 4 : 3;
+            const stride = this._mode == NeoPixelMode.RGBW ? 4 : 3;
             this.buf.shift(-(offset >> 0) * stride, this.start * stride, this._length * stride);
         }
 
@@ -486,7 +486,7 @@ namespace informatiktheater {
         //% subcategory="Stripe"
         //% group="Kontrolle"
         rotate(offset: number = 1): void {
-            const stride = this._mode === NeoPixelMode.RGBW ? 4 : 3;
+            const stride = this._mode == NeoPixelMode.RGBW ? 4 : 3;
             this.buf.rotate(-(offset >> 0) * stride, this.start * stride, this._length * stride);
         }
 
@@ -496,7 +496,7 @@ namespace informatiktheater {
         }
 
         power(): number {
-            const stride = this._mode === NeoPixelMode.RGBW ? 4 : 3;
+            const stride = this._mode == NeoPixelMode.RGBW ? 4 : 3;
             const end = this.start + this._length;
             let p = 0;
             for (let i = this.start; i < end; ++i) {
@@ -508,7 +508,7 @@ namespace informatiktheater {
         }
 
         private effectiveBrightness(): number {
-            if (this._power === PowerSource.Extern) return this.brightness;
+            if (this._power == PowerSource.Extern) return this.brightness;
             return Math.min(this.brightness, total_brightness_limit());
         }
 
@@ -518,7 +518,7 @@ namespace informatiktheater {
         }
 
         private setBufferRGB(offset: number, red: number, green: number, blue: number): void {
-            if (this._mode === NeoPixelMode.RGB_RGB) {
+            if (this._mode == NeoPixelMode.RGB_RGB) {
                 this.buf[offset + 0] = red;
                 this.buf[offset + 1] = green;
             } else {
@@ -533,7 +533,7 @@ namespace informatiktheater {
             const green = this.applyBrightness(unpackG(rgb));
             const blue  = this.applyBrightness(unpackB(rgb));
             const end   = this.start + this._length;
-            const stride = this._mode === NeoPixelMode.RGBW ? 4 : 3;
+            const stride = this._mode == NeoPixelMode.RGBW ? 4 : 3;
             for (let i = this.start; i < end; ++i) {
                 this.setBufferRGB(i * stride, red, green, blue);
             }
@@ -541,7 +541,7 @@ namespace informatiktheater {
 
         setPixelRGB(pixeloffset: number, rgb: number): void {
             if (pixeloffset < 0 || pixeloffset >= this._length) return;
-            const stride = this._mode === NeoPixelMode.RGBW ? 4 : 3;
+            const stride = this._mode == NeoPixelMode.RGBW ? 4 : 3;
             const offset = (pixeloffset + this.start) * stride;
             this.setBufferRGB(
                 offset,
@@ -708,12 +708,12 @@ namespace informatiktheater {
             if (x < 0 || x >= this.Width || y < 0 || y >= this.Height) return;
 
             // 8x8 and 20x20 matrices use a simple row-major layout.
-            if ((this.Width === 8 && this.Height === 8) ||
-                (this.Width === 20 && this.Height === 20)) {
+            if ((this.Width == 8 && this.Height == 8) ||
+                (this.Width == 20 && this.Height == 20)) {
                 this.strip.setPixelColor(y * this.Width + x, colour);
             } else {
                 // Serpentine column layout
-                if (x % 2 === 0) {
+                if (x % 2 == 0) {
                     this.strip.setPixelColor(y + x * this.Height, colour);
                 } else {
                     this.strip.setPixelColor(this.Height - 1 - y + x * this.Height, colour);
@@ -771,7 +771,7 @@ namespace informatiktheater {
         //% group="Features"
         //% colour.shadow=neopixel_colors
         draw_icon(icon: IconIndex, colour: number): void {
-            if (this.Height !== 16 || this.Width !== 16) return;
+            if (this.Height != 16 || this.Width != 16) return;
             this.drawBitmap(Icons[icon], 0, 16, 16, colour, 0x8000);
             this.strip.show();
         }
@@ -860,7 +860,7 @@ namespace informatiktheater {
             for (let col = 0; col < width; col++) {
                 const mask      = firstBitMask >> col;
                 const physCol   = x + col;
-                const evenCol   = (physCol % 2) === 0;
+                const evenCol   = (physCol % 2) == 0;
 
                 for (let row = 0; row < bitmapHeight; row++) {
                     // In even columns the physical string runs top→bottom,
@@ -991,7 +991,7 @@ namespace informatiktheater {
     //% subcategory="Eingabe"
     //% group="Ultraschall"
     export function ultrasonic_init(port: startbit_ultrasonicPort) {
-        if (port === startbit_ultrasonicPort.P2_P1) {
+        if (port == startbit_ultrasonicPort.P2_P1) {
             echoPin = DigitalPin.P2;
             trigPin = DigitalPin.P1;
         } else {
@@ -1021,7 +1021,7 @@ namespace informatiktheater {
 
         let d = pins.pulseIn(echoPin, PulseValue.High, 25000);
         // Filter out spurious zero readings
-        if (d === 0 && distanceBak !== 0) d = distanceBak;
+        if (d == 0 && distanceBak != 0) d = distanceBak;
         distanceBak = d;
 
         return Math.round((d * 10) / 6 / 58 / 1.6);
@@ -1087,10 +1087,10 @@ namespace informatiktheater {
         if (speed < 0 || speed > 100) return;
 
         // Forward is represented as negative in the hardware protocol
-        const adjusted = direction === MotorDirections.Forward ? -speed : speed;
+        const adjusted = direction == MotorDirections.Forward ? -speed : speed;
 
-        if (motor === HiwonderMotors.M1 || motor === HiwonderMotors.M12) motor_1_speed = adjusted;
-        if (motor === HiwonderMotors.M2 || motor === HiwonderMotors.M12) motor_2_speed = adjusted;
+        if (motor == HiwonderMotors.M1 || motor == HiwonderMotors.M12) motor_1_speed = adjusted;
+        if (motor == HiwonderMotors.M2 || motor == HiwonderMotors.M12) motor_2_speed = adjusted;
 
         send_motor_speeds();
     }
@@ -1101,8 +1101,8 @@ namespace informatiktheater {
     //% subcategory=Servo/Motor
     //% group=Motor
     export function startbit_stopMotor(motor: HiwonderMotors) {
-        if (motor === HiwonderMotors.M1 || motor === HiwonderMotors.M12) motor_1_speed = 0;
-        if (motor === HiwonderMotors.M2 || motor === HiwonderMotors.M12) motor_2_speed = 0;
+        if (motor == HiwonderMotors.M1 || motor == HiwonderMotors.M12) motor_1_speed = 0;
+        if (motor == HiwonderMotors.M2 || motor == HiwonderMotors.M12) motor_2_speed = 0;
         send_motor_speeds();
     }
 
@@ -1236,28 +1236,28 @@ namespace informatiktheater {
         if (!charStr) return;
 
         handleCmd += charStr;
-        if (countChar(handleCmd, "$") === 0) return;
+        if (countChar(handleCmd, "$") == 0) return;
 
         const index = findIndexof(handleCmd, "$", 0);
-        if (index === -1) return;
+        if (index == -1) return;
 
         const cmd = handleCmd.substr(0, index);
         const firstChar = cmd.charAt(0);
 
-        if (firstChar === "A" && cmd.length === 7) {
+        if (firstChar == "A" && cmd.length == 7) {
             const arg3Int = strToNumber(cmd.substr(5, 2));
-            if (arg3Int !== -1) {
+            if (arg3Int != -1) {
                 currentVoltage = Math.round(arg3Int * 78.63);
             }
-        } else if (firstChar === "M" && cmd.length === 18) {
+        } else if (firstChar == "M" && cmd.length == 18) {
             control.raiseEvent(MESSAGE_MAC, 1);
-        } else if (firstChar === "S" && cmd.length === 5) {
+        } else if (firstChar == "S" && cmd.length == 5) {
             const arg1Int = strToNumber(cmd.substr(1, 1));
             const arg2Str = cmd.substr(2, 3);
-            if (arg2Str !== "XXX") {
-                const arg2Int = (arg2Str.charAt(0) === "F") ? 0 : Math.min(strToNumber(arg2Str), 1000);
-                if      (arg1Int === 1) control.raiseEvent(MESSAGE_ANGLE, 1);
-                else if (arg1Int === 2) control.raiseEvent(MESSAGE_ANGLE, 2);
+            if (arg2Str != "XXX") {
+                const arg2Int = (arg2Str.charAt(0) == "F") ? 0 : Math.min(strToNumber(arg2Str), 1000);
+                if      (arg1Int == 1) control.raiseEvent(MESSAGE_ANGLE, 1);
+                else if (arg1Int == 2) control.raiseEvent(MESSAGE_ANGLE, 2);
             }
         }
 
@@ -1266,7 +1266,7 @@ namespace informatiktheater {
 
     function findIndexof(src: string, strFind: string, startIndex: number): number {
         for (let i = startIndex; i < src.length; i++) {
-            if (src.charAt(i) === strFind) return i;
+            if (src.charAt(i) == strFind) return i;
         }
         return -1;
     }
@@ -1274,7 +1274,7 @@ namespace informatiktheater {
     function countChar(src: string, strFind: string): number {
         let cnt = 0;
         for (let i = 0; i < src.length; i++) {
-            if (src.charAt(i) === strFind) cnt++;
+            if (src.charAt(i) == strFind) cnt++;
         }
         return cnt;
     }
@@ -1352,7 +1352,7 @@ namespace informatiktheater {
         if (mode >= 0 && mode <= 6) {
             if (enable) reg |= (1 << mode);
             else        reg &= 0xff - (1 << mode);
-        } else if (mode === ALL) {
+        } else if (mode == ALL) {
             reg = enable ? 0x7f : 0x00;
         }
         i2cwrite(APDS9960_ENABLE, reg);
