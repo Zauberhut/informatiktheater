@@ -27,13 +27,13 @@ enum NeoPixelColors {
     //% block.loc.de="violett"
     Violet = 0x8a2be2,
     //% block=purple
-    //% block.loc.de="magenta"
+    //% block.loc.de="pink"
     Purple = 0xff00ff,
     //% block=white
     //% block.loc.de="weiss"
     White = 0xffffff,
     //% block=black
-    //% block.loc.de="schwarz"
+    //% block.loc.de="schwarz (aus)"
     Black = 0x000000,
 }
 
