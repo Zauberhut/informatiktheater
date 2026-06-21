@@ -299,7 +299,7 @@ namespace informatiktheater {
         power_source: PowerSource
     ): Strip {
         let strip = new Strip();
-        const mode = NeoPixelMode.RGB_GRB;
+        const mode: NeoPixelMode = NeoPixelMode.RGB_GRB;
         let stride = mode == NeoPixelMode.RGBW ? 4 : 3;
         strip.buf = pins.createBuffer(numleds * stride);
         strip.start = 0;
