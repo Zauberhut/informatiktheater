@@ -6,7 +6,7 @@ informatiktheater.startbit_Init();
  */
 enum NeoPixelColors {
     //% block=red
-    //% block.loc.de="rot"
+    //% block.loc.de="rüt"
     Red = 0xff0000,
     //% block=orange
     //% block.loc.de="orange"
@@ -300,7 +300,7 @@ namespace informatiktheater {
     ): Strip {
         let strip = new Strip();
         const mode: NeoPixelMode = NeoPixelMode.RGB_GRB;
-        let stride = mode === NeoPixelMode.RGBW ? 4 : 3;
+        const stride = 3; // RGB_GRB is always 3 bytes per pixel
         strip.buf = pins.createBuffer(numleds * stride);
         strip.start = 0;
         strip._length = numleds;
