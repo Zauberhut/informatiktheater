@@ -220,16 +220,7 @@ const font8x3 = hex`
     3C04043C44443C00 3C04043C44443C00
 `;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Dimensions for the five matrix sizes: [width, height]
-// ─────────────────────────────────────────────────────────────────────────────
-const MATRIX_DIMS: number[][] = [
-    [16, 16],  // medium_16x16
-    [32, 8],   // medium_32x8
-    [64, 8],   // large_64x8
-    [8, 8],    // small_8x8
-    [20, 20],  // netz_20x20
-];
+
 
 /*
  Informatiktheater package
@@ -444,6 +435,7 @@ namespace informatiktheater {
         clear(): void {
             const stride = this._mode == NeoPixelMode.RGBW ? 4 : 3;
             this.buf.fill(0, this.start * stride, this._length * stride);
+            this.rawBuf.fill(0, this.start * 3, this._length * 3);
         }
 
         //% blockId="neopixel_length" block="%strip|length"
@@ -680,12 +672,16 @@ namespace informatiktheater {
         size: matrixSizes,
         power_source: PowerSource
     ): Matrix {
-        const dims = MATRIX_DIMS[size];
-        const w = dims[0];
-        const h = dims[1];
-
+        let w = 0;
+        let h = 0;
+        switch (size) {
+            case matrixSizes.medium_16x16: w = 16; h = 16; break;
+            case matrixSizes.medium_32x8:  w = 32; h = 8;  break;
+            case matrixSizes.large_64x8:   w = 64; h = 8;  break;
+            case matrixSizes.small_8x8:    w = 8;  h = 8;  break;
+            case matrixSizes.netz_20x20:   w = 20; h = 20; break;
+        }
         let matrix   = new Matrix();
-        // HiwonderMatrixPins values equal DigitalPin values – direct cast is safe.
         matrix.strip = informatiktheater.create(pin as number as HiwonderPins, h * w, power_source);
         matrix.Width  = w;
         matrix.Height = h;
@@ -740,18 +736,22 @@ namespace informatiktheater {
         setPixel(x: number, y: number, colour: number): void {
             if (x < 0 || x >= this.Width || y < 0 || y >= this.Height) return;
 
-            // 8x8 and 20x20 matrices use a simple row-major layout.
+            let index = 0;
             if ((this.Width == 8 && this.Height == 8) ||
                 (this.Width == 20 && this.Height == 20)) {
-                this.strip.setPixelColor(y * this.Width + x, colour);
+                // Row-major layout (no serpentine)
+                index = y * this.Width + x;
             } else {
-                // Serpentine column layout
+                // Serpentine column layout (16x16, 32x8, 64x8):
+                // Even columns (0,2,...): top->bottom  => x*H + y
+                // Odd  columns (1,3,...): bottom->top  => x*H + (H-1-y)
                 if (x % 2 == 0) {
-                    this.strip.setPixelColor(y + x * this.Height, colour);
+                    index = x * this.Height + y;
                 } else {
-                    this.strip.setPixelColor(this.Height - 1 - y + x * this.Height, colour);
+                    index = x * this.Height + (this.Height - 1 - y);
                 }
             }
+            this.strip.setPixelColor(index, colour);
         }
 
         /**
