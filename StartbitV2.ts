@@ -185,9 +185,9 @@ enum HiwonderMatrixPins {
 }
 
 enum PowerSource {
-    //% block="intern"
+    //% block="nein"
     Intern,
-    //% block="extern"
+    //% block="ja"
     Extern,
 }
 
@@ -286,7 +286,7 @@ namespace informatiktheater {
      */
     //% blockId="neopixel_create"
     //% block="NeoPixel at pin %pin| with %numleds leds| power source %power_source"
-    //% block.loc.de="NeoPixels an Pin %pin|mit %numleds Pixeln| Spannungsquelle %power_source"
+    //% block.loc.de="NeoPixels an Pin %pin|mit %numleds Pixeln| Zusatzakku: %power_source"
     //% parts="neopixel"
     //% power_source.defl=PowerSource.Intern
     //% subcategory="Stripe"
