@@ -6,7 +6,7 @@ informatiktheater.startbit_Init();
  */
 enum NeoPixelColors {
     //% block=red
-    //% block.loc.de="rot"
+    //% block.loc.de="rüt"
     Red = 0xff0000,
     //% block=orange
     //% block.loc.de="orange"
@@ -185,9 +185,9 @@ enum HiwonderMatrixPins {
 }
 
 enum PowerSource {
-    //% block="nein"
+    //% block="intern"
     Intern,
-    //% block="ja"
+    //% block="extern"
     Extern,
 }
 
@@ -286,7 +286,7 @@ namespace informatiktheater {
      */
     //% blockId="neopixel_create"
     //% block="NeoPixel at pin %pin| with %numleds leds| power source %power_source"
-    //% block.loc.de="NeoPixels an Pin %pin|mit %numleds Pixeln| Zusatzakku: %power_source"
+    //% block.loc.de="NeoPixels an Pin %pin|mit %numleds Pixeln| Spannungsquelle %power_source"
     //% parts="neopixel"
     //% power_source.defl=PowerSource.Intern
     //% subcategory="Stripe"
@@ -310,6 +310,7 @@ namespace informatiktheater {
         if (power_source == PowerSource.Intern) {
             leds_total += numleds;
         }
+        strip.initRawBuf();
         // HiwonderPins values are identical to DigitalPin values, so a direct
         // cast is safe here – no verbose switch/case needed.
         strip.setPin(pin as number as DigitalPin);
@@ -429,6 +430,7 @@ namespace informatiktheater {
         //% subcategory=Stripe
         //% group="Kontrolle"
         show() {
+            this.flushWithBrightness();
             ws2812b.sendBuffer(this.buf, this.pin);
         }
 
@@ -495,72 +497,103 @@ namespace informatiktheater {
             pins.digitalWritePin(this.pin, 0);
         }
 
-        power(): number {
-            const stride = this._mode == NeoPixelMode.RGBW ? 4 : 3;
-            const end = this.start + this._length;
-            let p = 0;
-            for (let i = this.start; i < end; ++i) {
-                for (let j = 0; j < stride; ++j) {
-                    p += this.buf[i + j];
-                }
-            }
-            return Math.idiv(this.length() * 7, 10) + Math.idiv(p * 480, 10000);
+        // rawBuf stores unscaled RGB (3 bytes/pixel, always R-G-B order).
+        // The hardware buf receives brightness-scaled, mode-reordered bytes
+        // only inside show(). This preserves original colours so the limit
+        // can be recomputed dynamically without losing information.
+        rawBuf: Buffer;
+
+        // Smoothed brightness cap (0-255), updated each show() call.
+        _smoothedLimit: number;
+
+        initRawBuf(): void {
+            this.rawBuf = pins.createBuffer(this._length * 3);
+            this._smoothedLimit = 64; // safe starting value
         }
 
-        private effectiveBrightness(): number {
+        // Estimate current draw (mA) at a given brightness from the raw buffer.
+        // WS2812B: up to 20 mA per colour channel at full value + full brightness.
+        private estimatedCurrentMA(brightness: number): number {
+            let sum = 0;
+            const end = this._length * 3;
+            for (let i = 0; i < end; i++) {
+                sum += this.rawBuf[i];
+            }
+            const dynamicMA = Math.idiv(Math.idiv(sum * brightness, 255) * 20, 255);
+            const quiescentMA = Math.idiv(this._length * 3, 10); // ~0.3 mA/LED
+            return dynamicMA + quiescentMA;
+        }
+
+        // Highest brightness that keeps estimated current within the 800 mA budget.
+        private dynamicBrightnessLimit(): number {
             if (this._power == PowerSource.Extern) return this.brightness;
-            return Math.min(this.brightness, total_brightness_limit());
+            const at255 = this.estimatedCurrentMA(255);
+            if (at255 == 0) return this.brightness; // all LEDs off – no limit needed
+            const limit = Math.idiv(800 * 255, at255);
+            return Math.min(limit, 255);
         }
 
-        private applyBrightness(channel: number): number {
-            const br = this.effectiveBrightness();
-            return br < 255 ? (channel * br) >> 8 : channel;
-        }
-
-        private setBufferRGB(offset: number, red: number, green: number, blue: number): void {
-            if (this._mode == NeoPixelMode.RGB_RGB) {
-                this.buf[offset + 0] = red;
-                this.buf[offset + 1] = green;
+        // Low-pass filtered brightness:
+        //   drops instantly  → safety (never exceed budget even for one frame)
+        //   rises slowly     → no visible flicker when pixel content changes
+        private smoothedBrightness(): number {
+            const target = Math.min(this.brightness, this.dynamicBrightnessLimit());
+            if (target < this._smoothedLimit) {
+                this._smoothedLimit = target;                               // drop immediately
             } else {
-                this.buf[offset + 0] = green;
-                this.buf[offset + 1] = red;
+                this._smoothedLimit += Math.idiv(target - this._smoothedLimit, 8); // rise ~1/8 per frame
             }
-            this.buf[offset + 2] = blue;
+            return this._smoothedLimit;
+        }
+
+        power(): number {
+            return this.estimatedCurrentMA(this._smoothedLimit);
+        }
+
+        // Copy rawBuf → hardware buf with brightness scaling and mode reordering.
+        // Called once per show() – this is the only place colours hit the wire.
+        private flushWithBrightness(): void {
+            const br = this.smoothedBrightness();
+            const stride = this._mode == NeoPixelMode.RGBW ? 4 : 3;
+            for (let i = 0; i < this._length; i++) {
+                const raw = i * 3;
+                const r = br < 255 ? (this.rawBuf[raw + 0] * br) >> 8 : this.rawBuf[raw + 0];
+                const g = br < 255 ? (this.rawBuf[raw + 1] * br) >> 8 : this.rawBuf[raw + 1];
+                const b = br < 255 ? (this.rawBuf[raw + 2] * br) >> 8 : this.rawBuf[raw + 2];
+                const hw = (this.start + i) * stride;
+                if (this._mode == NeoPixelMode.RGB_RGB) {
+                    this.buf[hw + 0] = r;
+                    this.buf[hw + 1] = g;
+                } else {
+                    this.buf[hw + 0] = g; // GRB
+                    this.buf[hw + 1] = r;
+                }
+                this.buf[hw + 2] = b;
+            }
         }
 
         private setAllRGB(rgb: number) {
-            const red   = this.applyBrightness(unpackR(rgb));
-            const green = this.applyBrightness(unpackG(rgb));
-            const blue  = this.applyBrightness(unpackB(rgb));
-            const end   = this.start + this._length;
-            const stride = this._mode == NeoPixelMode.RGBW ? 4 : 3;
-            for (let i = this.start; i < end; ++i) {
-                this.setBufferRGB(i * stride, red, green, blue);
+            const r = unpackR(rgb);
+            const g = unpackG(rgb);
+            const b = unpackB(rgb);
+            for (let i = 0; i < this._length; i++) {
+                const raw = i * 3;
+                this.rawBuf[raw + 0] = r;
+                this.rawBuf[raw + 1] = g;
+                this.rawBuf[raw + 2] = b;
             }
         }
 
         setPixelRGB(pixeloffset: number, rgb: number): void {
             if (pixeloffset < 0 || pixeloffset >= this._length) return;
-            const stride = this._mode == NeoPixelMode.RGBW ? 4 : 3;
-            const offset = (pixeloffset + this.start) * stride;
-            this.setBufferRGB(
-                offset,
-                this.applyBrightness(unpackR(rgb)),
-                this.applyBrightness(unpackG(rgb)),
-                this.applyBrightness(unpackB(rgb))
-            );
+            const raw = pixeloffset * 3;
+            this.rawBuf[raw + 0] = unpackR(rgb);
+            this.rawBuf[raw + 1] = unpackG(rgb);
+            this.rawBuf[raw + 2] = unpackB(rgb);
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Brightness limiter (internal battery protection)
-    // ─────────────────────────────────────────────────────────────────────────
-
-    function total_brightness_limit(): number {
-        // WS2812B draws ~60 mA per LED at full white.
-        // TP5400 on the Hiwonder board delivers ~800 mA usable.
-        return Math.idiv(800 * 255, leds_total * 60) & 0xff;
-    }
+    // (dynamic brightness limiting is now fully inside Strip)
 
     // ─────────────────────────────────────────────────────────────────────────
     // Color helpers (public API – blocks and TS)
@@ -855,24 +888,16 @@ namespace informatiktheater {
             colour: number,
             firstBitMask: number
         ): void {
-            const yOffset = (this.Height - bitmapHeight) / 2;
+            // Vertical centering offset so the bitmap sits in the middle of the matrix
+            const yOffset = Math.idiv(this.Height - bitmapHeight, 2);
 
             for (let col = 0; col < width; col++) {
-                const mask      = firstBitMask >> col;
-                const physCol   = x + col;
-                const evenCol   = (physCol % 2) == 0;
-
+                const mask = firstBitMask >> col;
                 for (let row = 0; row < bitmapHeight; row++) {
-                    // In even columns the physical string runs top→bottom,
-                    // so bitmap row 0 maps to the lowest Ypos in the loop.
-                    // In odd columns the string runs bottom→top (zigzag).
-                    const bitmapRow = evenCol ? row : (bitmapHeight - 1 - row);
-                    if (bitmap[bitmapRow] & mask) {
-                        const Ypos = evenCol ? (bitmapHeight - 1 - row) : row;
-                        this.strip.setPixelColor(
-                            physCol * this.Height + Ypos + yOffset,
-                            colour
-                        );
+                    if (bitmap[row] & mask) {
+                        // Delegate to setPixel – it already handles serpentine,
+                        // row-major (8x8 / 20x20), and bounds checking correctly.
+                        this.setPixel(x + col, yOffset + row, colour);
                     }
                 }
             }
