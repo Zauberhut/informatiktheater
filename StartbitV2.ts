@@ -460,7 +460,7 @@ namespace informatiktheater {
             this.brightness = brightness & 0xff;
         }
 
-        //% blockId="neopixel_shift" block="%strip|shift pixels by %offset"
+ //% blockId="neopixel_shift" block="%strip|shift pixels by %offset"
         //% block.loc.de="%strip|verschiebe NeoPixel um %offset"
         //% strip.defl=strip
         //% weight=40
@@ -469,7 +469,9 @@ namespace informatiktheater {
         //% group="Kontrolle"
         shift(offset: number = 1): void {
             const stride = this._mode == NeoPixelMode.RGBW ? 4 : 3;
-            this.buf.shift(-(offset >> 0) * stride, this.start * stride, this._length * stride);
+            const o = offset >> 0;
+            this.buf.shift(-o * stride, this.start * stride, this._length * stride);
+            this.rawBuf.shift(-o * 3, this.start * 3, this._length * 3);
         }
 
         //% blockId="neopixel_rotate" block="%strip|rotate pixels by %offset"
@@ -481,9 +483,10 @@ namespace informatiktheater {
         //% group="Kontrolle"
         rotate(offset: number = 1): void {
             const stride = this._mode == NeoPixelMode.RGBW ? 4 : 3;
-            this.buf.rotate(-(offset >> 0) * stride, this.start * stride, this._length * stride);
+            const o = offset >> 0;
+            this.buf.rotate(-o * stride, this.start * stride, this._length * stride);
+            this.rawBuf.rotate(-o * 3, this.start * 3, this._length * 3);
         }
-
         setPin(pin: DigitalPin): void {
             this.pin = pin;
             pins.digitalWritePin(this.pin, 0);
