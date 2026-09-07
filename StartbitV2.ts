@@ -228,6 +228,22 @@ const font8x3 = hex`
 //% weight=110 color=#3a4cf7
 namespace informatiktheater {
 
+// ─────────────────────────────────────────────────────────────────────────
+// Simulator-Unterstützung: meldet dem MakeCode-Simulator einen NeoPixel-
+// "Part" am angegebenen Pin, damit Streifen/Matrix im Simulator sichtbar
+// sind und live aktualisiert werden. Wird nie als Block angezeigt – die
+// Funktion existiert nur, damit der Compiler eine Funktion mit
+// //% parts="neopixel" und einem echten DigitalPin-Argument findet
+// (unsere eigenen HiwonderPins/HiwonderMatrixPins-Enums lösen das nicht aus).
+// ─────────────────────────────────────────────────────────────────────────
+//% parts="neopixel"
+//% trackArgs=0,1
+function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
+    // Kein Code nötig – auf echter Hardware passiert hier nichts.
+    // Der Simulator erkennt den Aufruf am //% parts="neopixel"-Tag.
+}
+    
+
     let leds_total = 0;
     let motor_1_speed = 0;
     let motor_2_speed = 0;
@@ -305,6 +321,7 @@ namespace informatiktheater {
         // HiwonderPins values are identical to DigitalPin values, so a direct
         // cast is safe here – no verbose switch/case needed.
         strip.setPin(pin as number as DigitalPin);
+        attachNeoPixelSimPart(pin as number as DigitalPin, numleds);   // NEU fuer Simulator
         return strip;
     }
 
