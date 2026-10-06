@@ -1202,13 +1202,23 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
     //% subcategory="Eingabe"
     //% group="Taster"
     export function trittmatte_pressed(port: startbit_trittmattePort, handler: () => void): void {
-        const pin = trittmattePin(port);
-        setupPinPulse(pin);
-        pins.onPulsed(pin, PulseValue.High, () => {
-            if (pins.pulseDuration() > 1000 * debounce_time) handler();
-        });
-    }
-
+    const pin = trittmattePin(port);
+    pins.setPull(pin, PinPullMode.PullUp);
+    let last = pins.digitalReadPin(pin);
+    let lastChange = 0;
+    control.inBackground(() => {
+        while (true) {
+            const v = pins.digitalReadPin(pin);
+            const now = input.runningTime();
+            if (v != last && now - lastChange > debounce_time) {
+                last = v;
+                lastChange = now;
+                if (v == 0) handler();   // gedrückt = Pin gegen GND (ggf. auf 1 ändern)
+            }
+            basic.pause(5);
+        }
+    });
+}
     //% weight=12
     //% block="Push-button released|on %port"
     //% block.loc.de="Taster losgelassen|auf|%port"
