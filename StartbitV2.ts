@@ -1195,14 +1195,11 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
         pins.setEvents(pin, PinEventType.Pulse);
         pins.setPull(pin, PinPullMode.PullUp);
     }
-
-    //% weight=8
-    //% block="Push-button pressed|on %port"
-    //% block.loc.de="Taster gedrückt|auf|%port"
-    //% subcategory="Eingabe"
-    //% group="Taster"
-    export function trittmatte_pressed(port: startbit_trittmattePort, handler: () => void): void {
-    const pin = trittmattePin(port);
+/**
+ * Überwacht einen Pin per Polling, entprellt und ruft onChange(pegel) bei jeder
+ * stabilen Pegeländerung auf (0 = gedrückt, 1 = losgelassen bei Pull-Up).
+ */
+function watchTaster(pin: DigitalPin, onChange: (level: number) => void): void {
     pins.setPull(pin, PinPullMode.PullUp);
     let last = pins.digitalReadPin(pin);
     let lastChange = 0;
@@ -1213,46 +1210,53 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
             if (v != last && now - lastChange > debounce_time) {
                 last = v;
                 lastChange = now;
-                if (v == 0) handler();   // gedrückt = Pin gegen GND (ggf. auf 1 ändern)
+                onChange(v);
             }
             basic.pause(5);
         }
     });
 }
-    //% weight=12
-    //% block="Push-button released|on %port"
-    //% block.loc.de="Taster losgelassen|auf|%port"
-    //% subcategory="Eingabe"
-    //% group="Taster"
-    export function trittmatte_released(port: startbit_trittmattePort, handler: () => void): void {
-        const pin = trittmattePin(port);
-        setupPinPulse(pin);
-        pins.onPulsed(pin, PulseValue.Low, () => {
-            if (pins.pulseDuration() > 1000 * debounce_time) handler();
-        });
-    }
 
-    //% weight=20
-    //% block="Push-button on/off|on %port |state "
-    //% block.loc.de="Taster ein/aus|auf %port |Status"
-    //% subcategory="Eingabe"
-    //% group="Taster"
-    //% draggableParameters
-    export function trittmatte_einschalten(
-        port: startbit_trittmattePort,
-        handler: (Schalter_ein: boolean) => void
-    ): void {
-        const pin = trittmattePin(port);
-        setupPinPulse(pin);
-        let state = false;
-        pins.onPulsed(pin, PulseValue.High, () => {
-            if (pins.pulseDuration() > 1000 * debounce_time) {
-                state = !state;
-                handler(state);
-            }
-        });
-    }
+//% weight=8
+//% block="Push-button pressed|on %port"
+//% block.loc.de="Taster gedrückt|auf|%port"
+//% subcategory="Eingabe"
+//% group="Taster"
+export function trittmatte_pressed(port: startbit_trittmattePort, handler: () => void): void {
+    watchTaster(trittmattePin(port), (level) => {
+        if (level == 0) handler();   // gedrückt = Pin gegen GND
+    });
+}
 
+//% weight=12
+//% block="Push-button released|on %port"
+//% block.loc.de="Taster losgelassen|auf|%port"
+//% subcategory="Eingabe"
+//% group="Taster"
+export function trittmatte_released(port: startbit_trittmattePort, handler: () => void): void {
+    watchTaster(trittmattePin(port), (level) => {
+        if (level == 1) handler();   // losgelassen = Pin wieder HIGH
+    });
+}
+
+//% weight=20
+//% block="Push-button on/off|on %port |state "
+//% block.loc.de="Taster ein/aus|auf %port |Status"
+//% subcategory="Eingabe"
+//% group="Taster"
+//% draggableParameters
+export function trittmatte_einschalten(
+    port: startbit_trittmattePort,
+    handler: (Schalter_ein: boolean) => void
+): void {
+    let state = false;
+    watchTaster(trittmattePin(port), (level) => {
+        if (level == 0) {
+            state = !state;
+            handler(state);
+        }
+    });
+}
     // ─────────────────────────────────────────────────────────────────────────
     // Serial / board init
     // ─────────────────────────────────────────────────────────────────────────
