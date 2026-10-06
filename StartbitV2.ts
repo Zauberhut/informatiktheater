@@ -1178,7 +1178,7 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
         // Inline mapping used in every trittmatte function
     };
 
-    const debounce_time = 150; // ms
+    const debounce_time = 50; // ms
 
     /** Maps a startbit_trittmattePort to the corresponding DigitalPin. */
     function trittmattePin(port: startbit_trittmattePort): DigitalPin {
@@ -1217,7 +1217,7 @@ function watchTaster(pin: DigitalPin, onChange: (level: number) => void): void {
     });
 }
 
-//% weight=8
+//% weight=20
 //% block="Push-button pressed|on %port"
 //% block.loc.de="Taster gedrückt|auf|%port"
 //% subcategory="Eingabe"
@@ -1239,7 +1239,7 @@ export function trittmatte_released(port: startbit_trittmattePort, handler: () =
     });
 }
 
-//% weight=20
+//% weight=8
 //% block="Push-button on/off|on %port |state "
 //% block.loc.de="Taster ein/aus|auf %port |Status"
 //% subcategory="Eingabe"
