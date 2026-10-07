@@ -1,4 +1,4 @@
-// Auto init hiwonder board when extension is added
+// Auto init board when extension is added
 informatiktheater.startbit_Init();
 
 /**
@@ -38,9 +38,9 @@ enum NeoPixelColors {
 }
 
 /**
- * DC motors on Hiwonder board
+ * DC motors
  */
-enum HiwonderMotors {
+enum Motors {
     //% block="Motor 1"
     M1,
     //% block="Motor 2"
@@ -161,34 +161,47 @@ enum matrixSizes {
     netz_20x20,
 }
 
-/**
- * Available pins on ports (connectors) for strips
- */
-enum HiwonderPins {
-    P2 = DigitalPin.P2,
-    P1 = DigitalPin.P1,
-    P14 = DigitalPin.P14,
-    P13 = DigitalPin.P13,
-    P16 = DigitalPin.P16,
-    Board = DigitalPin.P15,
-}
-
-/**
- * Available pins on ports (connectors) for matrix (no onboard pin)
- */
-enum HiwonderMatrixPins {
-    P2 = DigitalPin.P2,
-    P1 = DigitalPin.P1,
-    P14 = DigitalPin.P14,
-    P13 = DigitalPin.P13,
-    P16 = DigitalPin.P16,
-}
-
 enum PowerSource {
     //% block="intern"
     Intern,
     //% block="extern"
     Extern,
+}
+
+/**
+ * Eingeschränkte Pin-Auswahl für den Streifen-Anschluss (nur die am Board
+ * vorhandenen Stecker + die Onboard-Position). Die Werte entsprechen exakt
+ * den jeweiligen DigitalPin-Werten.
+ */
+enum StripPort {
+    //% block="P1"
+    P1 = DigitalPin.P1,
+    //% block="P2"
+    P2 = DigitalPin.P2,
+    //% block="P13"
+    P13 = DigitalPin.P13,
+    //% block="P14"
+    P14 = DigitalPin.P14,
+    //% block="P16"
+    P16 = DigitalPin.P16,
+    //% block="Board"
+    Board = DigitalPin.P15,
+}
+
+/**
+ * Eingeschränkte Pin-Auswahl für den Matrix-Anschluss (kein Onboard-Pin).
+ */
+enum MatrixPort {
+    //% block="P1"
+    P1 = DigitalPin.P1,
+    //% block="P2"
+    P2 = DigitalPin.P2,
+    //% block="P13"
+    P13 = DigitalPin.P13,
+    //% block="P14"
+    P14 = DigitalPin.P14,
+    //% block="P16"
+    P16 = DigitalPin.P16,
 }
 
 const font8x3 = hex`
@@ -228,22 +241,6 @@ const font8x3 = hex`
 //% weight=110 color=#3a4cf7
 namespace informatiktheater {
 
-// ─────────────────────────────────────────────────────────────────────────
-// Simulator-Unterstützung: meldet dem MakeCode-Simulator einen NeoPixel-
-// "Part" am angegebenen Pin, damit Streifen/Matrix im Simulator sichtbar
-// sind und live aktualisiert werden. Wird nie als Block angezeigt – die
-// Funktion existiert nur, damit der Compiler eine Funktion mit
-// //% parts="neopixel" und einem echten DigitalPin-Argument findet
-// (unsere eigenen HiwonderPins/HiwonderMatrixPins-Enums lösen das nicht aus).
-// ─────────────────────────────────────────────────────────────────────────
-//% parts="neopixel"
-//% trackArgs=0,1
-function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
-    // Kein Code nötig – auf echter Hardware passiert hier nichts.
-    // Der Simulator erkennt den Aufruf am //% parts="neopixel"-Tag.
-}
-    
-
     let leds_total = 0;
     let motor_1_speed = 0;
     let motor_2_speed = 0;
@@ -282,6 +279,28 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // Pin-Shadow-Blöcke: schränken die im Editor angezeigte Pin-Auswahl auf
+    // die am Board tatsächlich vorhandenen Anschlüsse ein. Der eigentliche
+    // Funktionsparameter bleibt ein echter DigitalPin (wichtig für
+    // parts="neopixel" / die Simulator-Unterstützung) – nur das sichtbare
+    // Eingabefeld wird durch diese kleinen "Übersetzer"-Blöcke ersetzt.
+    // ─────────────────────────────────────────────────────────────────────────
+
+    //% blockId=strip_pin_shadow block="%pin"
+    //% shim=TD_ID
+    //% blockHidden=true
+    export function __stripPin(pin: StripPort): DigitalPin {
+        return pin as number as DigitalPin;
+    }
+
+    //% blockId=matrix_pin_shadow block="%pin"
+    //% shim=TD_ID
+    //% blockHidden=true
+    export function __matrixPin(pin: MatrixPort): DigitalPin {
+        return pin as number as DigitalPin;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Strip factory
     // ─────────────────────────────────────────────────────────────────────────
 
@@ -295,13 +314,15 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
     //% block="NeoPixel at pin %pin| with %numleds leds| power source %power_source"
     //% block.loc.de="NeoPixels an Pin %pin|mit %numleds Pixeln| Spannungsquelle %power_source"
     //% parts="neopixel"
+    //% trackArgs=0,1
+    //% pin.shadow=strip_pin_shadow
     //% power_source.defl=PowerSource.Intern
     //% subcategory="Stripe"
     //% weight=110
     //% blockSetVariable=strip
     //% group="Setup"
     export function create(
-        pin: HiwonderPins,
+        pin: DigitalPin,
         numleds: number,
         power_source: PowerSource
     ): Strip {
@@ -318,10 +339,7 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
             leds_total += numleds;
         }
         strip.initRawBuf();
-        // HiwonderPins values are identical to DigitalPin values, so a direct
-        // cast is safe here – no verbose switch/case needed.
-        strip.setPin(pin as number as DigitalPin);
-        attachNeoPixelSimPart(pin as number as DigitalPin, numleds);   // NEU fuer Simulator
+        strip.setPin(pin);
         return strip;
     }
 
@@ -683,12 +701,14 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
     //% blockId="Matrix_Create"
     //% block="matrix auf Pin %pin|mit einer Grösse von %size| Spannungsquelle %power_source"
     //% power_source.defl=PowerSource.Intern
+    //% pin.shadow=matrix_pin_shadow
     //% subcategory="Matrix"
     //% group="Setup"
     //% parts="neopixel"
+    //% trackArgs=0,1
     //% blockSetVariable=matrix
     export function create_matrix(
-        pin: HiwonderMatrixPins,
+        pin: DigitalPin,
         size: matrixSizes,
         power_source: PowerSource
     ): Matrix {
@@ -702,7 +722,7 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
             case matrixSizes.netz_20x20:   w = 20; h = 20; break;
         }
         let matrix   = new Matrix();
-        matrix.strip = informatiktheater.create(pin as number as HiwonderPins, h * w, power_source);
+        matrix.strip = informatiktheater.create(pin, h * w, power_source);
         matrix.Width  = w;
         matrix.Height = h;
         return matrix;
@@ -1128,14 +1148,14 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
     //% speed.min=0 speed.max=100
     //% subcategory=Servo/Motor
     //% group=Motor
-    export function startbit_setMotorSpeed(motor: HiwonderMotors, direction: MotorDirections, speed: number) {
+    export function startbit_setMotorSpeed(motor: Motors, direction: MotorDirections, speed: number) {
         if (speed < 0 || speed > 100) return;
 
         // Forward is represented as negative in the hardware protocol
         const adjusted = direction == MotorDirections.Forward ? -speed : speed;
 
-        if (motor == HiwonderMotors.M1 || motor == HiwonderMotors.M12) motor_1_speed = adjusted;
-        if (motor == HiwonderMotors.M2 || motor == HiwonderMotors.M12) motor_2_speed = adjusted;
+        if (motor == Motors.M1 || motor == Motors.M12) motor_1_speed = adjusted;
+        if (motor == Motors.M2 || motor == Motors.M12) motor_2_speed = adjusted;
 
         send_motor_speeds();
     }
@@ -1145,9 +1165,9 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
     //% block.loc.de="%motor stoppen"
     //% subcategory=Servo/Motor
     //% group=Motor
-    export function startbit_stopMotor(motor: HiwonderMotors) {
-        if (motor == HiwonderMotors.M1 || motor == HiwonderMotors.M12) motor_1_speed = 0;
-        if (motor == HiwonderMotors.M2 || motor == HiwonderMotors.M12) motor_2_speed = 0;
+    export function startbit_stopMotor(motor: Motors) {
+        if (motor == Motors.M1 || motor == Motors.M12) motor_1_speed = 0;
+        if (motor == Motors.M2 || motor == Motors.M12) motor_2_speed = 0;
         send_motor_speeds();
     }
 
