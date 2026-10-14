@@ -1163,10 +1163,10 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Push-button / Trittmatte
+    // Button / Taster
     // ─────────────────────────────────────────────────────────────────────────
 
-    export enum startbit_trittmattePort {
+    export enum startbit_buttonPort {
         P2  = 0x01,
         P14 = 0x02,
         P16 = 0x03,
@@ -1174,19 +1174,19 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
         P13 = 0x05,
     }
 
-    const TRITTMATTE_PIN: { [key: number]: DigitalPin } = {
-        // Inline mapping used in every trittmatte function
+    const BUTTON_PIN: { [key: number]: DigitalPin } = {
+        // Inline mapping used in every button function
     };
 
     const debounce_time = 50; // ms
 
-    /** Maps a startbit_trittmattePort to the corresponding DigitalPin. */
-    function trittmattePin(port: startbit_trittmattePort): DigitalPin {
+    /** Maps a startbit_buttonPort to the corresponding DigitalPin. */
+    function buttonPin(port: startbit_buttonPort): DigitalPin {
         switch (port) {
-            case startbit_trittmattePort.P2:  return DigitalPin.P2;
-            case startbit_trittmattePort.P1:  return DigitalPin.P1;
-            case startbit_trittmattePort.P14: return DigitalPin.P14;
-            case startbit_trittmattePort.P13: return DigitalPin.P13;
+            case startbit_buttonPort.P2:  return DigitalPin.P2;
+            case startbit_buttonPort.P1:  return DigitalPin.P1;
+            case startbit_buttonPort.P14: return DigitalPin.P14;
+            case startbit_buttonPort.P13: return DigitalPin.P13;
             default:                          return DigitalPin.P16;
         }
     }
@@ -1222,8 +1222,8 @@ function watchTaster(pin: DigitalPin, onChange: (level: number) => void): void {
 //% block.loc.de="Taster gedrückt|auf|%port"
 //% subcategory="Eingabe"
 //% group="Taster"
-export function trittmatte_pressed(port: startbit_trittmattePort, handler: () => void): void {
-    watchTaster(trittmattePin(port), (level) => {
+export function button_pressed(port: startbit_buttonPort, handler: () => void): void {
+    watchTaster(buttonPin(port), (level) => {
         if (level == 0) handler();   // gedrückt = Pin gegen GND
     });
 }
@@ -1233,8 +1233,8 @@ export function trittmatte_pressed(port: startbit_trittmattePort, handler: () =>
 //% block.loc.de="Taster losgelassen|auf|%port"
 //% subcategory="Eingabe"
 //% group="Taster"
-export function trittmatte_released(port: startbit_trittmattePort, handler: () => void): void {
-    watchTaster(trittmattePin(port), (level) => {
+export function button_released(port: startbit_butonPort, handler: () => void): void {
+    watchTaster(buttonPin(port), (level) => {
         if (level == 1) handler();   // losgelassen = Pin wieder HIGH
     });
 }
@@ -1245,12 +1245,12 @@ export function trittmatte_released(port: startbit_trittmattePort, handler: () =
 //% subcategory="Eingabe"
 //% group="Taster"
 //% draggableParameters
-export function trittmatte_einschalten(
-    port: startbit_trittmattePort,
+export function button_einschalten(
+    port: startbit_buttonPort,
     handler: (Schalter_ein: boolean) => void
 ): void {
     let state = false;
-    watchTaster(trittmattePin(port), (level) => {
+    watchTaster(buttonPin(port), (level) => {
         if (level == 0) {
             state = !state;
             handler(state);
@@ -1279,7 +1279,6 @@ export function trittmatte_einschalten(
             }
         });
         basic.pause(2000);
-        console.log("Informatiktheater initialized");
     }
 
     let handleCmd     = "";
