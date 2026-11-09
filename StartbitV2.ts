@@ -186,8 +186,10 @@ enum HiwonderMatrixPins {
 
 enum PowerSource {
     //% block="intern"
+    //% block.loc.de="Board"
     Intern,
     //% block="extern"
+    //% block.loc.de="Zusatzbatterie"
     Extern,
 }
 
