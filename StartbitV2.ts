@@ -797,7 +797,7 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
          * Clears the screen before scrolling; show() is called internally.
          */
         //% blockId="Matrix_scrollText"
-        //% block="%matrix Text 32x8: %text|Geschwindigkeit (0-200): %speed|Farbe: %colour"
+        //% block="%matrix Fliesstext 32x8: %text|Tempo (0-200): %speed|Farbe: %colour"
         //% subcategory="Matrix"
         //% group="Features"
         //% colour.shadow=neopixel_colors
