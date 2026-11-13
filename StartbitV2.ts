@@ -221,8 +221,8 @@ const font8x3 = hex`
     0020782020281000 0000484848582800 0000444444281000 00004444547C2800
     0000484830484800 0000484848381060 0000780830407800 1820206020201800
     1010100010101000 3008080C08083000 2850000000000000
-    384444447C444400 384444447C444400 384444447C444400 3C04043C44443C00
-    3C04043C44443C00 3C04043C44443C00
+    280038043C443C00 2800384444443800 2800484848582800
+    283844447C444400 2838444444443800 2844444444443800
 `;
 
 
@@ -414,7 +414,20 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
             }
             this.show();
         }
+  
+        //% blockId="neopixel_show" block="%strip|show"
+        //% block.loc.de="%strip|anzeigen"
+        //% strip.defl=strip
+        //% weight=110
+        //% parts="neopixel"
+        //% subcategory=Stripe
+        //% group="Kontrolle"
+        show() {
+            this.flushWithBrightness();
+            ws2812b.sendBuffer(this.buf, this.pin);
+        }
 
+        
         //% blockId="neopixel_set_pixel_color"
         //% block="%strip|set color of Neopixel %pixeloffset|to %rgb=neopixel_colors|amount %number"
         //% block.loc.de="%strip|setze Farbe von Neopixel %pixeloffset|auf %rgb=neopixel_colors|Anzahl %number"
@@ -435,18 +448,7 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
             this.setPixelRGB(pixeloffset >> 0, rgb >> 0);
         }
 
-        //% blockId="neopixel_show" block="%strip|show"
-        //% block.loc.de="%strip|anzeigen"
-        //% strip.defl=strip
-        //% weight=51
-        //% parts="neopixel"
-        //% subcategory=Stripe
-        //% group="Kontrolle"
-        show() {
-            this.flushWithBrightness();
-            ws2812b.sendBuffer(this.buf, this.pin);
-        }
-
+      
         //% blockId="neopixel_clear" block="%strip|clear"
         //% block.loc.de="%strip|ausschalten"
         //% strip.defl=strip
@@ -788,12 +790,13 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
         //% group="Features"
         //% colour.shadow=neopixel_colors
         //% x_offset.defl=0 x_offset.min=0 x_offset.max=32
-        showText(text: string, x_offset: number, colour: number): void {
-            for (let i = 0; i < text.length; i++) {
-                this.drawBitmap(getLettermap(text.charAt(i)), x_offset + 6 * i, 6, 8, colour, 0x80);
-            }
-            this.strip.show();
-        }
+    showText(text: string, x_offset: number, colour: number): void {
+    const glyphs = textToGlyphs(text);
+    for (let i = 0; i < glyphs.length; i++) {
+        this.drawBitmap(getLettermap(glyphs[i]), x_offset + 6 * i, 6, 8, colour, 0x80);
+    }
+    this.strip.show();
+}
 
         /**
          * Scroll text across the matrix (6×8 pixel font).
@@ -805,21 +808,22 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
         //% group="Features"
         //% colour.shadow=neopixel_colors
         //% speed.min=1 speed.max=200 speed.defl=50
-        scrollText(text: string, speed: number, colour: number): void {
-            this.strip.clear();
-            const charWidth = 6;
-            for (let Xpos = this.Width; Xpos > -charWidth * text.length; Xpos--) {
-                for (let i = 0; i < text.length; i++) {
-                    const x = Xpos + charWidth * i;
-                    if (x < this.Width && x > -charWidth) {
-                        this.drawBitmap(getLettermap(text.charAt(i)), x, charWidth, 8, colour, 0x80);
-                    }
-                }
-                this.strip.show();
-                basic.pause(1000 / speed);
-                this.strip.clear();
+      scrollText(text: string, speed: number, colour: number): void {
+    this.strip.clear();
+    const glyphs = textToGlyphs(text);
+    const charWidth = 6;
+    for (let Xpos = this.Width; Xpos > -charWidth * glyphs.length; Xpos--) {
+        for (let i = 0; i < glyphs.length; i++) {
+            const x = Xpos + charWidth * i;
+            if (x < this.Width && x > -charWidth) {
+                this.drawBitmap(getLettermap(glyphs[i]), x, charWidth, 8, colour, 0x80);
             }
         }
+        this.strip.show();
+        basic.pause(1000 / speed);
+        this.strip.clear();
+    }
+}
 
         /**
          * Draw a pre-defined 16×16 icon. Does nothing if the matrix is not 16×16.
@@ -933,17 +937,47 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
     // Font helper
     // ─────────────────────────────────────────────────────────────────────────
 
-    function getLettermap(char: string): number[] {
-        const letterMap: number[] = [0, 0, 0, 0, 0, 0, 0, 0];
-        const offset = char.charCodeAt(0) - 32; // ASCII offset into font table
-        if (offset >= 0) {
-            for (let i = 0; i < 8; i++) {
-                letterMap[i] = font8x3.getNumber(NumberFormat.UInt8BE, offset * 8 + i);
-            }
-        }
-        return letterMap;
-    }
+    // ─────────────────────────────────────────────────────────────────────────
+// Font helper
+// ─────────────────────────────────────────────────────────────────────────
 
+// Glyph slots 95..100 in font8x3 hold: ä ö ü Ä Ö Ü
+function glyphIndex(code: number): number {
+    switch (code) {
+        case 228: return 95;  // ä
+        case 246: return 96;  // ö
+        case 252: return 97;  // ü
+        case 196: return 98;  // Ä
+        case 214: return 99;  // Ö
+        case 220: return 100; // Ü
+    }
+    if (code >= 32 && code <= 126) return code - 32;
+    return 0; // unknown character -> space (also avoids reading outside the table)
+}
+
+// Converts a string into a list of glyph indices.
+// Handles both cases: umlauts as one character (code 196..252)
+// or as UTF-8 byte pairs (0xC3 0x84 etc.), depending on the MakeCode version.
+function textToGlyphs(text: string): number[] {
+    const out: number[] = [];
+    for (let i = 0; i < text.length; i++) {
+        let code = text.charCodeAt(i);
+        if (code == 0xC3 && i + 1 < text.length) {
+            code = 0xC0 + (text.charCodeAt(i + 1) & 0x3F); // UTF-8 -> Unicode
+            i++;
+        }
+        out.push(glyphIndex(code));
+    }
+    return out;
+}
+
+function getLettermap(glyph: number): number[] {
+    const letterMap: number[] = [0, 0, 0, 0, 0, 0, 0, 0];
+    for (let i = 0; i < 8; i++) {
+        letterMap[i] = font8x3.getNumber(NumberFormat.UInt8BE, glyph * 8 + i);
+    }
+    return letterMap;
+}
     // ─────────────────────────────────────────────────────────────────────────
     // ColorPattern factories (one per matrix width – required by MakeCode blocks)
     // ─────────────────────────────────────────────────────────────────────────
