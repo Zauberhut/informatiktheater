@@ -1272,7 +1272,7 @@ export function button_pressed(port: startbit_buttonPort, handler: () => void): 
 //% block.loc.de="Taster losgelassen|auf|%port"
 //% subcategory="Eingabe"
 //% group="Taster"
-export function button_released(port: startbit_butonPort, handler: () => void): void {
+export function button_released(port: startbit_buttonPort, handler: () => void): void {
     watchTaster(buttonPin(port), (level) => {
         if (level == 1) handler();   // losgelassen = Pin wieder HIGH
     });
