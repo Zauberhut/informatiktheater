@@ -1,6 +1,9 @@
 // Auto init hiwonder board when extension is added
 informatiktheater.startbit_Init();
 
+const INTERN_BUDGET_MA = 700;
+const EXTERN_BUDGET_MA = 2000;
+
 /**
  * Well known colors for a NeoPixel strip
  */
@@ -538,15 +541,15 @@ function attachNeoPixelSimPart(pin: DigitalPin, numleds: number) {
             return dynamicMA + quiescentMA;
         }
 
-        // Highest brightness that keeps estimated current within the 800 mA budget.
-        private dynamicBrightnessLimit(): number {
-            if (this._power == PowerSource.Extern) return this.brightness;
-            const at255 = this.estimatedCurrentMA(255);
-            if (at255 == 0) return this.brightness; // all LEDs off – no limit needed
-            const limit = Math.idiv(800 * 255, at255);
-            return Math.min(limit, 255);
-        }
-
+        // Highest brightness that keeps estimated current within limit budget.
+       private dynamicBrightnessLimit(): number {
+    const budget = this._power == PowerSource.Extern
+        ? EXTERN_BUDGET_MA
+        : INTERN_BUDGET_MA;
+    const at255 = this.estimatedCurrentMA(255);
+    if (at255 == 0) return this.brightness;   // all LEDs off, nothing to limit
+    return Math.min(255, Math.idiv(budget * 255, at255));
+}
         // Low-pass filtered brightness:
         //   drops instantly  → safety (never exceed budget even for one frame)
         //   rises slowly     → no visible flicker when pixel content changes
